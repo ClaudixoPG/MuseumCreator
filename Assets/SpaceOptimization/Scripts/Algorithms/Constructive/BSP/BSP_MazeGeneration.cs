@@ -4,22 +4,55 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Text;
-using static PCG.Utilities;
 
-namespace PCG
+namespace SpaceOptimization.BSP
 {
     public class BSP_MazeGeneration : MonoBehaviour
     {
-        public int width = 20;
-        public int height = 20;
+        private int width = 20;
+        private int height = 20;
+        private int maximalRoomSize = 5;
 
-        public int maximalRoomSize = 5;
+        public MapCreator mapCreator;
 
         //To restart binary partition
         public List<GameObject> containers;
-        public void Build()
+        public enum SplitDirection
         {
+            Horizontal,
+            Vertical,
+            Default
+        }
 
+        private int[,] matrix;
+
+        //get matrix
+        public int[,] GetMatrix()
+        {
+            return matrix;
+        }
+
+
+        public void CreateMaze(int width, int height, int maximalRoomSize, string filename = "Maze")
+        {
+            //restart containers
+            RestartContainers();
+
+            //Debug Partition
+            Debug.Log("Creating Maze Map");
+            this.width = width;
+            this.height = height;
+            this.maximalRoomSize = maximalRoomSize;
+
+            Build(filename);
+            matrix = mapCreator.Creator(filename);
+            mapCreator.SetNeighbors(matrix);
+            //width = matrix.GetLength(0);
+            //height = matrix.GetLength(1);
+        }
+
+        public void Build(string filename = "Maze")
+        {
             RestartContainers();
 
             var matrix = new int[width, height];
@@ -32,9 +65,8 @@ namespace PCG
             Split(matrix, root);
             //CreateHallway(matrix, root);
 
-            //Write Matrix to file in var path = Application.dataPath + "/SpaceOptimizationModule/Resources/Maps/" + filename + ".txt";
-            string filename = "Maze";
-            string path = Application.dataPath + "/SpaceOptimizationModule/Resources/Maps/" + filename + ".txt";
+            //Write Matrix to file in var path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".txt";
+            string path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".txt";
             WriteMatrixToFile(matrix, path);
         }
         void Split(int[,] matrix, Node root)
@@ -182,7 +214,7 @@ namespace PCG
             root.RightChild = rightChild;
             Split(matrix, rightChild);
         }
-        void RestartContainers()
+        public void RestartContainers()
         {
             foreach (GameObject container in containers)
             {

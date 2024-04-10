@@ -5,12 +5,17 @@ using System.Linq;
 using System.IO;
 using UnityEngine.UI;
 using TMPro;
-using PCG;
+using SpaceOptimization.BSP;
 //using static Genetic;
 
 namespace SpaceOptimization{
     public class Map : MonoBehaviour
     {
+        public MapCreator mapCreator;
+        public FloorSolver floorSolver;
+        public CanvasController canvasController;
+        public BSP_MazeGeneration bspMazeGeneration;
+
         public string filename;
         [Header("Debug Floor Elements")]
         public List<GameObject> debugFloorObjects;
@@ -26,9 +31,9 @@ namespace SpaceOptimization{
         public Material floorBlockedMaterial;
         public Material wallBlockedMaterial;
         public Material unblockedMaterial;
+
+
         private int[,] matrix;
-        private MapCreator mapCreator;
-        private FloorSolver floorSolver;
         private List<GameObject> openNodes = new List<GameObject>();
         private List<GameObject> closedNodes = new List<GameObject>();
         private float timer = 0f;
@@ -37,7 +42,7 @@ namespace SpaceOptimization{
         //save data
         private List<Data> data = new List<Data>();
 
-        [Header("Interactive Canvas")]
+        /*[Header("Interactive Canvas")]
         //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
         //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
         //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
@@ -50,10 +55,10 @@ namespace SpaceOptimization{
         //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
         //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
         //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
-
+        */
         //public GeneticsPanel Step2Configuration;
         //public List<Panel> panels;
-        public CanvasController canvasController;
+
 
         private int populationSize;
         private int generations;
@@ -63,53 +68,29 @@ namespace SpaceOptimization{
         private Genetic.SelectionType selectionType;
 
         private void Awake() {
-            mapCreator = gameObject.GetComponent<MapCreator>();
-            floorSolver = gameObject.GetComponent<FloorSolver>();
             openNodes = mapCreator.GetOpenNodes();
             closedNodes = mapCreator.GetClosedNodes();
         }
 
-        private bool firstTime = true;
+        private bool alreadyGenerated = false;
 
+        public void PopulateMap() {
 
-        /*
-        //Debug
-        public BinarySpacePartition bsp;
-        public void CreateBinaryPartitionMap()
-        {
-            //Debug Partition
-            Debug.Log("Creating Binary Partition Map");
-
-            bsp.Build();
-            filename = "BSP";
-            matrix = mapCreator.Creator(filename);
-            mapCreator.SetNeighbors(matrix);
-            width = matrix.GetLength(0);
-            height = matrix.GetLength(1);
-        }
-
-        //Debug
-        public BSP_MazeGeneration maze;
-        public void CreateMazeMap()
-        {
-            //Debug Partition
-            Debug.Log("Creating Maze Map");
-
-            maze.Build();
-            filename = "Maze";
-            //matrix = mapCreator.Creator(filename);
-            //mapCreator.SetNeighbors(matrix);
-            //width = matrix.GetLength(0);
-            //height = matrix.GetLength(1);
-            CreateMap();
-        }*/
-
-        public void CreateMap() {
+            //if matrix is empty, load the example matrix
+            if (matrix == null)
+            {
+                filename = "ExampleMap";
+                matrix = mapCreator.Creator(filename);
+                mapCreator.SetNeighbors(matrix);
+                width = matrix.GetLength(0);
+                height = matrix.GetLength(1);
+            }
 
             //search for panel with the name GeneticsPanel and convert it to GeneticsPanel
             var panel = canvasController.panels.Find(p => p.name == "PanelStep2") as GeneticsPanel;
             var panelConfiguration = panel.GetPanelData();
             
+            //get values from panel
             populationSize = int.TryParse(panelConfiguration[0], out int popSize) ? popSize : 0;
             generations = int.TryParse(panelConfiguration[1], out int gen) ? gen : 0;
             haveElitism = panelConfiguration[2] == "True" ? true : false;
@@ -117,28 +98,11 @@ namespace SpaceOptimization{
             mutationType = (Genetic.MutationType)int.Parse(panelConfiguration[4]);
             selectionType = (Genetic.SelectionType)int.Parse(panelConfiguration[5]);
 
-            /*populationSize = int.TryParse(panel.populationSizeInput.text, out int popSize) ? popSize : 0;
-            generations = int.TryParse(panel.generationsInput.text, out int gen) ? gen : 0;
-            haveElitism = panel.haveElitismToggle.isOn;
-            crossoverType = (Genetic.CrossoverType)panel.crossoverTypeDropdown.value;
-            mutationType = (Genetic.MutationType)panel.mutationTypeDropdown.value;
-            selectionType = (Genetic.SelectionType)panel.selectionTypeDropdown.value;
-            */
-
             //search for invalid values of genetics configuration
             if(populationSize < 1 || generations < 1){
                 Debug.LogError("Invalid values for population size or generations");
                 return;
             }
-
-            if(firstTime){
-                matrix = mapCreator.Creator(filename);
-                mapCreator.SetNeighbors(matrix);
-                width = matrix.GetLength(0);
-                height = matrix.GetLength(1);
-                firstTime = false;
-            }
-
 
             //Genetic Algorithm
 
@@ -191,6 +155,29 @@ namespace SpaceOptimization{
 
             SaveData(data,"MazeData.csv");
             data.Clear();
+        }
+
+        public void BuildMap(string filename)
+        {
+            var panel = canvasController.panels.Find(p => p.name == "PanelStep1") as BSPPanel;
+            var panelConfiguration = panel.GetPanelData();
+            var width = int.TryParse(panelConfiguration[0], out int w) ? w : 0;
+            var height = int.TryParse(panelConfiguration[1], out int h) ? h : 0;
+            var minLeafSize = int.TryParse(panelConfiguration[2], out int min) ? min : 0;
+
+            //use the BSP algorithm to generate the map
+            bspMazeGeneration.CreateMaze(w,h,min,filename);
+
+            matrix = bspMazeGeneration.GetMatrix();
+            mapCreator.SetNeighbors(matrix);
+            this.width = matrix.GetLength(0);
+            this.height = matrix.GetLength(1);
+
+            /*matrix = mapCreator.Creator(filename);
+            mapCreator.SetNeighbors(matrix);
+            width = matrix.GetLength(0);
+            height = matrix.GetLength(1);*/
+
         }
 
         //create a CSV file to save data from the genetic algorithm, use the a List of class Data to save the data

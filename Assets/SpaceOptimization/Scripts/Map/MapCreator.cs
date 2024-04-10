@@ -40,7 +40,7 @@ namespace SpaceOptimization{
 
         public int[,] Creator(string filename = "map")
         {
-            var path = Application.dataPath + "/SpaceOptimizationModule/Resources/Maps/" + filename + ".txt";
+            var path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".txt";
             int[,] matrix = ReadMatrixWithSize(path);
             for (int i = 0; i < matrix.GetLength(0); i++) {
                 for (int j = 0; j < matrix.GetLength(1); j++)

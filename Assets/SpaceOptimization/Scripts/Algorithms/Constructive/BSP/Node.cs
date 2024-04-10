@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static PCG.Utilities;
 
-namespace PCG{
+namespace SpaceOptimization.BSP
+{
     public class Node
     {
         Tuple<int, int> initPoint;
@@ -12,9 +12,9 @@ namespace PCG{
         Room room;
         Node leftChild;
         Node rightChild;
-        SplitDirection splitDirection;
+        BSP_MazeGeneration.SplitDirection splitDirection;
 
-        public Node(Tuple<int, int> initPoint, Tuple<int, int> endPoint, SplitDirection splitDirection = SplitDirection.Default, Node leftChild = null, Node rightChild = null, Room room = null)
+        public Node(Tuple<int, int> initPoint, Tuple<int, int> endPoint, BSP_MazeGeneration.SplitDirection splitDirection = BSP_MazeGeneration.SplitDirection.Default, Node leftChild = null, Node rightChild = null, Room room = null)
         {
             this.InitPoint = initPoint;
             this.EndPoint = endPoint;
@@ -29,10 +29,8 @@ namespace PCG{
         public Tuple<int, int> InitPoint { get => initPoint; set => initPoint = value; }
         public Tuple<int, int> EndPoint { get => endPoint; set => endPoint = value; }
         public Room Room { get => room; set => room = value; }
-        public SplitDirection SplitDirection { get => splitDirection; set => splitDirection = value; }
+        public BSP_MazeGeneration.SplitDirection SplitDirection { get => splitDirection; set => splitDirection = value; }
     }
-
-    
 
     public class Room
     {

@@ -26,6 +26,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5597221567812417010}
   m_RootOrder: 3
@@ -56,6 +57,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5597221567812417010}
   m_RootOrder: 0
@@ -86,6 +88,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5597221567812417010}
   m_RootOrder: 1
@@ -99,10 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5597221567812417010}
-  - component: {fileID: 5597221567812417008}
-  - component: {fileID: 5597221567812417009}
   - component: {fileID: 5597221567812417011}
-  - component: {fileID: 5597221567812417014}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -120,6 +120,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5597221566700008948}
   - {fileID: 5597221567472385699}
@@ -128,43 +129,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5597221567812417008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5597221567812417021}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7982af8ce6b118d4cac2230dec83a326, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5597221567812417009
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5597221567812417021}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d2f8809bdcd828489fd890b0dfd9314, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabs:
-  - {fileID: 3606055758433423526, guid: 6c77273702b72b04e8db14ae07b0946a, type: 3}
-  - {fileID: 8498312422388770823, guid: c9a78f0f21d55f8458f68db9bd2f4b8f, type: 3}
-  - {fileID: 3095847803521787175, guid: 27415daef16f34740a532b5dcf3e61a2, type: 3}
-  - {fileID: 8498312422388770823, guid: c3da0e103198b704b94369bc20138036, type: 3}
-  - {fileID: 8498312422388770823, guid: 59a1290ebecdb0e4b892380b0b895591, type: 3}
-  - {fileID: 8498312422388770823, guid: f0c338333ad7ec64f814aad1d0371527, type: 3}
-  containers:
-  - {fileID: 5597221568362189908}
-  - {fileID: 5597221566700008951}
-  - {fileID: 5597221567472385698}
-  - {fileID: 5597221566610893697}
-  size: 10
 --- !u!114 &5597221567812417011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,6 +141,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3244909117f45a46aca97b96018fde7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapCreator: {fileID: 0}
+  floorSolver: {fileID: 0}
+  canvasController: {fileID: 0}
   filename: Map
   debugFloorObjects:
   - {fileID: 7062017905389786656, guid: 2ec49df957035f5478ed789f9a1709bc, type: 3}
@@ -245,40 +212,13 @@ MonoBehaviour:
   - {fileID: 1112507407675820413, guid: 75c01d09e304e0943aae35ccd9c5be6d, type: 3}
   - {fileID: 7762910720443596456, guid: fd64d835c4fe6e54d86fe67a00c67ba6, type: 3}
   - {fileID: 5107918110214171220, guid: 4b9d04378ac42f54fa9d372b0f60ce67, type: 3}
-  neighborBlockedMaterial: {fileID: 2100000, guid: 9c9ffe6d391fd87419ab3787486706bd,
-    type: 2}
-  floorBlockedMaterial: {fileID: 2100000, guid: 9c9ffe6d391fd87419ab3787486706bd,
-    type: 2}
+  artworkObjects: []
+  neighborBlockedMaterial: {fileID: 2100000, guid: 9c9ffe6d391fd87419ab3787486706bd, type: 2}
+  floorBlockedMaterial: {fileID: 2100000, guid: 9c9ffe6d391fd87419ab3787486706bd, type: 2}
   wallBlockedMaterial: {fileID: 2100000, guid: 9c9ffe6d391fd87419ab3787486706bd, type: 2}
   unblockedMaterial: {fileID: 2100000, guid: dde9d977821b1dc479692c6fe20fdc92, type: 2}
   width: 0
   height: 0
-  canvasGroup: {fileID: 0}
-  pieceName: {fileID: 0}
-  museumName: {fileID: 0}
-  infoPanel: {fileID: 0}
-  markers: {fileID: 0}
-  audioPlayer: {fileID: 0}
-  populationSizeInput: {fileID: 0}
-  generationsInput: {fileID: 0}
-  haveElitismToggle: {fileID: 0}
-  crossoverTypeDropdown: {fileID: 0}
-  mutationTypeDropdown: {fileID: 0}
-  selectionTypeDropdown: {fileID: 0}
---- !u!114 &5597221567812417014
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5597221567812417021}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64d08dad890ae2a4785838dd8657056d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  map: {fileID: 5597221567812417011}
-  analyzer: {fileID: 0}
 --- !u!1 &5597221568362189908
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,6 +245,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5597221567812417010}
   m_RootOrder: 2
