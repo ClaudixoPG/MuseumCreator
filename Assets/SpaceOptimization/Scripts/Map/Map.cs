@@ -3,69 +3,51 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.IO;
-using UnityEngine.UI;
-using TMPro;
 using SpaceOptimization.BSP;
-//using static Genetic;
 
 namespace SpaceOptimization{
     public class Map : MonoBehaviour
     {
+        [Header("Map Configuration")]
+        public string filename;
+
+        [Header("References")]
+
         public MapCreator mapCreator;
         public FloorSolver floorSolver;
-        public CanvasController canvasController;
         public BSP_MazeGeneration bspMazeGeneration;
-
-        public string filename;
-        [Header("Debug Floor Elements")]
+        public CanvasController canvasController;
+        public RoomRecognition roomRecognition;
+        
+        [Header("Debug Lists")]
         public List<GameObject> debugFloorObjects;
-        [Header("Floor Elements")]
         public List<GameObject> floorObjects;
-        [Header("Wall Elements")]
         public List<GameObject> wallObjects;
-        [Header("Artwork Elements")]
         public List<GameObject> artworkObjects;
-        //debug
-        [Header("Materials")]
+
+        [Header("Debug Materials")]
         public Material neighborBlockedMaterial;
         public Material floorBlockedMaterial;
         public Material wallBlockedMaterial;
         public Material unblockedMaterial;
 
-
         private int[,] matrix;
         private List<GameObject> openNodes = new List<GameObject>();
         private List<GameObject> closedNodes = new List<GameObject>();
         private float timer = 0f;
-        public int width;
-        public int height;
-        //save data
-        private List<Data> data = new List<Data>();
-
-        /*[Header("Interactive Canvas")]
-        //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
-        //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
-        //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
-        public CanvasGroup canvasGroup;
-        public Text pieceName;
-        public Text museumName;
-        public Text infoPanel;
-        public Image markers;
-        public AudioSource audioPlayer;
-        //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
-        //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
-        //CANCER PARA DEBUGEAR; BORRAR EN EL FUTURO
-        */
-        //public GeneticsPanel Step2Configuration;
-        //public List<Panel> panels;
-
-
+        
+        //Map data and configuration
+        private int width;
+        private int height;
         private int populationSize;
         private int generations;
         private bool haveElitism;
         private Genetic.CrossoverType crossoverType;
         private Genetic.MutationType mutationType;
         private Genetic.SelectionType selectionType;
+
+        //save data
+        private List<Data> data = new List<Data>();
 
         private void Awake() {
             openNodes = mapCreator.GetOpenNodes();
@@ -153,9 +135,44 @@ namespace SpaceOptimization{
                 node.GetComponent<Renderer>().material = floorBlockedMaterial;
             }
 
+            //Save artworks distrubution to reconstruct the rooms in the museum
+            SaveArtworksDistribution(dataWithElitism.individual.GetCromosome());
+
             SaveData(data,"MazeData.csv");
             data.Clear();
         }
+
+        void SaveArtworksDistribution(Vector3Int[] chromosome)
+        {
+            if(File.Exists(Application.dataPath + "/SpaceOptimization/Resources/Maps/ArtworksDistribution.csv"))
+            {
+                File.Delete(Application.dataPath + "/SpaceOptimization/Resources/Maps/ArtworksDistribution.csv");
+            }
+            else
+            {
+                Debug.Log("File not found");
+            }
+
+            Debug.Log("Saving Artworks Distribution");
+            //create a CSV file to save data from the genetic algorithm, use the a List of class Data to save the data
+            string path = Application.dataPath + "/SpaceOptimization/Resources/Maps/ArtworksDistribution.csv";
+            StreamWriter writer = new StreamWriter(path, false);
+            
+            var values = new List<string>();
+
+            for(int i = 0; i < chromosome.Length; i++)
+            {
+                if (chromosome[i].x == 0) continue;
+                values.Add(chromosome[i].y.ToString());
+                //writer.WriteLine(chromosome[i].y);
+            }
+            //write values to file as a row in the CSV file
+            writer.WriteLine(string.Join(";",values));
+
+
+            writer.Close();
+        }   
+
 
         public void BuildMap(string filename)
         {
@@ -179,6 +196,27 @@ namespace SpaceOptimization{
             height = matrix.GetLength(1);*/
 
         }
+
+        public void TSP()
+        {
+            //if matrix is empty, load the example matrix
+            if (matrix == null)
+            {
+                filename = "ExampleMap";
+                matrix = mapCreator.Creator(filename);
+                mapCreator.SetNeighbors(matrix);
+                width = matrix.GetLength(0);
+                height = matrix.GetLength(1);
+            }
+
+            //search for panel with the name TSPPanel and convert it to TSPPanel
+            var panel = canvasController.panels.Find(p => p.name == "PanelStep3") as TSPPanel;
+            var panelConfiguration = panel.GetPanelData();
+
+            roomRecognition.TSP(matrix);
+
+        }
+
 
         //create a CSV file to save data from the genetic algorithm, use the a List of class Data to save the data
         public void SaveData(List<Data> data, string filename = "Data.csv")

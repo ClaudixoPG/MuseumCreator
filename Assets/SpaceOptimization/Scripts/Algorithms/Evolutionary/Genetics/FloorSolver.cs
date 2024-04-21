@@ -100,10 +100,10 @@ public class FloorSolver : Genetic
 
         EvaluatePopulation(population);
 
-        for(int i = 0; i < population.Count; i++)
+        /*for(int i = 0; i < population.Count; i++)
         {
             Debug.Log("Element " + i + "; is legal?: " + analyzer.CheckIfIndividualIsLegal(population[i].GetCromosome()) + "; fitness: " + population[i].GetFitness() );
-        }
+        }*/
 
         //CAREFUL
         foreach(var individual in population){
@@ -119,7 +119,7 @@ public class FloorSolver : Genetic
             }
         }
 
-        Debug.Log("Legal: " + legalChildrenCount + "; Illegal: " + illegalChildrenCount);
+        //Debug.Log("Legal: " + legalChildrenCount + "; Illegal: " + illegalChildrenCount);
         
         //Debug.Log("is Legal?: " + analyzer.CheckIfIndividualIsLegal(bestIndividual.GetCromosome()) +  " Fitness: " + bestIndividual.GetFitness() + "Infactibles: " + infact );
 
