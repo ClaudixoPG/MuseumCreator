@@ -42,10 +42,10 @@ namespace SpaceOptimization
             
             //Create the graph new knew the rooms and the connections between them, and number of artworks in each room
             CreateTheGraph();
-            
             //SaveGraph(rooms);
             //solver.Calculate();
         }
+
 
         void LoadChromosome()
         {
@@ -64,6 +64,17 @@ namespace SpaceOptimization
         void InitializeData(int[,] matrix)
         {
             this.matrix = matrix;
+            for(int i = 0;i < matrix.GetLength(0);i++)
+            {
+                for(int j = 0;j < matrix.GetLength(1);j++)
+                {
+                    if (matrix[i,j] == 3)
+                    {
+                        matrix[i, j] = 999;
+                    }
+                }
+            }
+
             rows = matrix.GetLength(0);
             cols = matrix.GetLength(1);
             visited = new bool[rows, cols];
@@ -88,19 +99,37 @@ namespace SpaceOptimization
         }
         void IdentifyConnections()
         {
-            // Identify connections
+            //print matrix
             for (int i = 0; i < rows; i++)
             {
+                string row = "";
                 for (int j = 0; j < cols; j++)
                 {
-                    if (matrix[i, j] == 3) // Check if it is a door and get the connected rooms
+                    row += matrix[i, j] + " ";
+                }
+                Debug.Log(row);
+            }
+
+            // Identify connections
+            for (int i = 1; i < rows -1; i++)
+            {
+                for (int j = 1; j < cols -1; j++)
+                {
+                    if (matrix[i, j] == 999) // Check if it is a door and get the connected rooms
                     {
                         var connectedRooms = GetConnectedRooms(i, j);
-                        foreach (var pair in connectedRooms)
+                        
+                        if (connectedRooms.Item1 != 0 && connectedRooms.Item2 != 0)
+                        {
+                            rooms[connectedRooms.Item1].ConnectedRooms.Add(connectedRooms.Item2);
+                            rooms[connectedRooms.Item2].ConnectedRooms.Add(connectedRooms.Item1);
+                        }
+
+                        /*foreach (var pair in connectedRooms)
                         {
                             rooms[pair.Item1].ConnectedRooms.Add(pair.Item2);
                             rooms[pair.Item2].ConnectedRooms.Add(pair.Item1);
-                        }
+                        }*/
                     }
                 }
             }
@@ -132,35 +161,30 @@ namespace SpaceOptimization
 
         void CreateTheGraph()
         {
+
+
             //Create the graph
             foreach (var room in rooms)
             {
+                foreach (var connectedRoom in room.Value.ConnectedRooms)
+                {
+                    var weight = CalculateWeightBetweenRooms(room.Value, rooms[connectedRoom]);
+                    Debug.Log("Room " + room.Key + " is connected to room " + connectedRoom + " with weight " + weight);
+                }
+
                 foreach (var connectedRoom in room.Value.ConnectedRooms)
                 {
                     var x = room.Value.nodes[0].Position.x;
                     var y = room.Value.nodes[0].Position.y;
                     var connectedX = rooms[connectedRoom].nodes[0].Position.x;
                     var connectedY = rooms[connectedRoom].nodes[0].Position.y;
+
                     var scale = 10f;
 
                     Debug.DrawLine(new Vector3(x, 0, y) * scale, new Vector3(connectedX, 0, connectedY) * scale, Color.green, 1000f);
-
-                    //Debug.DrawLine(new Vector3(room.Value.nodes[0].Position.x, 0, room.Value.nodes[0].Position.y), new Vector3(rooms[connectedRoom].nodes[0].Position.x, 0, rooms[connectedRoom].nodes[0].Position.y), Color.green, 1000f);
-                    //Create a text displaying the weight between the rooms in the scene, for debugging purposes
-                    //var text = new TextMeshProUGUI();
-                    //text.text = CalculateWeightBetweenRooms(room.Value, rooms[connectedRoom]).ToString();
-                    //text.transform.position = new Vector3((room.Value.nodes[0].Position.x + rooms[connectedRoom].nodes[0].Position.x) / 2, 0, (room.Value.nodes[0].Position.y + rooms[connectedRoom].nodes[0].Position.y) / 2);
-                    var text = Instantiate(weightCanvas, new Vector3((room.Value.nodes[0].Position.x + rooms[connectedRoom].nodes[0].Position.x) / 2, 0, (room.Value.nodes[0].Position.y + rooms[connectedRoom].nodes[0].Position.y) / 2), Quaternion.identity);
-                    text.GetComponentInChildren<TextMeshProUGUI>().text = CalculateWeightBetweenRooms(room.Value, rooms[connectedRoom]).ToString();
-                    text.transform.LookAt(Camera.main.transform);
-
-                    //Debug.Log("The weight between room " + room.Key + " and room " + connectedRoom + " is " + CalculateWeightBetweenRooms(room.Value, rooms[connectedRoom]));
                 }
             }
             //Remove the cases when room is connected to itself
-
-
-            //Create a graph with the rooms and the weights between them
         }
 
         int CalculateWeightBetweenRooms(Room room1, Room room2)
@@ -296,20 +320,34 @@ namespace SpaceOptimization
         }   
 
         //Get the connected rooms of a door
-        List<Tuple<int, int>> GetConnectedRooms(int row, int col)
+        Tuple<int, int> GetConnectedRooms(int row, int col)
         {
-            //Check if the door is connected to two rooms, if so, return the connected rooms and the weight of the edge
+            //Check left to right
+            if (matrix[row,col+1] == 999)
+            {
+                //connectedRooms.Add(Tuple.Create(matrix[row, col - 1], matrix[row, col + 2]));
+                return Tuple.Create(matrix[row, col - 1], matrix[row, col + 2]);
+            }
+            //Check right to left
+            if (matrix[row, col - 1] == 999)
+            {
+                //connectedRooms.Add(Tuple.Create(matrix[row, col + 1], matrix[row, col - 2]));
+                return Tuple.Create(matrix[row, col + 1], matrix[row, col - 2]);
+            }
+            //Check top to bottom
+            if (matrix[row + 1, col] == 999)
+            {
+                //connectedRooms.Add(Tuple.Create(matrix[row - 1, col], matrix[row + 2, col]));
+                return Tuple.Create(matrix[row - 1, col], matrix[row + 2, col]);
+            }
+            //Check bottom to top
+            if (matrix[row - 1, col] == 999)
+            {
+                //connectedRooms.Add(Tuple.Create(matrix[row + 1, col], matrix[row - 2, col]));
+                return Tuple.Create(matrix[row + 1, col], matrix[row - 2, col]);
+            }
 
-            var connectedRooms = new List<Tuple<int, int>>();
-            if (row > 0 && row < rows - 1 && matrix[row - 1, col] > 0 && matrix[row + 1, col] > 0)
-            {
-                connectedRooms.Add(Tuple.Create(matrix[row - 1, col], matrix[row + 1, col]));
-            }
-            if (col > 0 && col < cols - 1 && matrix[row, col - 1] > 0 && matrix[row, col + 1] > 0)
-            {
-                connectedRooms.Add(Tuple.Create(matrix[row, col - 1], matrix[row, col + 1]));
-            }
-            return connectedRooms;
+            return Tuple.Create(0, 0);
         }
 
         class Room

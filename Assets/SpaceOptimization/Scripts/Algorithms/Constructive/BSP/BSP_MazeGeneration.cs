@@ -64,6 +64,7 @@ namespace SpaceOptimization.BSP
             Node root = new Node(new Tuple<int, int>(0, 0), new Tuple<int, int>(matrix.GetLength(0) - 1, matrix.GetLength(1) - 1));
             Split(matrix, root);
             //CreateHallway(matrix, root);
+            RandomDoors(matrix);
 
             //Write Matrix to file in var path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".txt";
             string path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".txt";
@@ -129,13 +130,46 @@ namespace SpaceOptimization.BSP
             for (int i = root.InitPoint.Item2; i <= root.EndPoint.Item2; i++)
             {
                 //create 2 doors in the wall, one in the first quarter and another in the third quarter
-                if (i == root.InitPoint.Item2 + (root.EndPoint.Item2 - root.InitPoint.Item2) / 4 || i == root.InitPoint.Item2 + (root.EndPoint.Item2 - root.InitPoint.Item2) * 3 / 4)
-                //if (i == root.InitPoint.Item2 + (root.EndPoint.Item2 - root.InitPoint.Item2) / 2)
+                //if (i == root.InitPoint.Item2 + (root.EndPoint.Item2 - root.InitPoint.Item2) / 4 || i == root.InitPoint.Item2 + (root.EndPoint.Item2 - root.InitPoint.Item2) * 3 / 4)
+                /*if (i == root.InitPoint.Item2 + (root.EndPoint.Item2 - root.InitPoint.Item2) / 2)
                 {
-                    matrix[splitPoint, i] = 3;
-                    matrix[splitPoint + 1, i] = 3;
+                    //i = random position between the first and third quarter
+                    var randomPoint = UnityEngine.Random.Range(0, (root.EndPoint.Item2 - root.InitPoint.Item2));
+                    i = randomPoint;
+
+                    //check left, right, up and down cells, if only one is a wall, create a door between them
+                    if (matrix[splitPoint, i - 1] == 1 && matrix[splitPoint, i + 1] == 2 && matrix[splitPoint - 1, i] == 2 && matrix[splitPoint + 1, i] == 2)
+                    {
+                        matrix[splitPoint, i] = 3;
+                        matrix[splitPoint + 1, i] = 3;
+                    }
+                    else if (matrix[splitPoint, i + 1] == 1 && matrix[splitPoint, i - 1] == 2 && matrix[splitPoint - 1, i] == 2 && matrix[splitPoint + 1, i] == 2)
+                    {
+                        matrix[splitPoint, i] = 3;
+                        matrix[splitPoint + 1, i] = 3;
+                    }
+                    else if (matrix[splitPoint - 1, i] == 1 && matrix[splitPoint + 1, i] == 2 && matrix[splitPoint, i - 1] == 2 && matrix[splitPoint, i + 1] == 2)
+                    {
+                        matrix[splitPoint, i] = 3;
+                        matrix[splitPoint + 1, i] = 3;
+                    }
+                    else if (matrix[splitPoint + 1, i] == 1 && matrix[splitPoint - 1, i] == 2 && matrix[splitPoint, i - 1] == 2 && matrix[splitPoint, i + 1] == 2)
+                    {
+                        matrix[splitPoint, i] = 3;
+                        matrix[splitPoint + 1, i] = 3;
+                    }
+                    else
+                    {
+                        matrix[splitPoint, i] = 1;
+                        matrix[splitPoint + 1, i] = 1;
+
+                        //move the iteration to the left to create a door
+                        matrix[splitPoint, i-1] = 3;
+                        matrix[splitPoint + 1, i - 1] = 3;
+
+                    }
                 }
-                else
+                else*/
                 {
                     matrix[splitPoint, i] = 1;
                     matrix[splitPoint + 1, i] = 1;
@@ -184,13 +218,51 @@ namespace SpaceOptimization.BSP
             for (int i = root.InitPoint.Item1; i <= root.EndPoint.Item1; i++)
             {
                 //create 2 doors in the wall, one in the first quarter and another in the third quarter
-                if (i == root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) / 4 || i == root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) * 3 / 4)
+                /*if (i == root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) / 4 || i == root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) * 3 / 4)
                 //if(i ==root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) / 2)
                 {
                     matrix[i, splitPoint] = 3;
                     matrix[i, splitPoint + 1] = 3;
                 }
-                else
+                else*/
+                /*if(i == root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) / 2)
+                //if (i == root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) / 4 || i == root.InitPoint.Item1 + (root.EndPoint.Item1 - root.InitPoint.Item1) * 3 / 4)
+                {
+                    //i = random position between the first and third quarter
+                    var randomPoint = UnityEngine.Random.Range(0, (root.EndPoint.Item1 - root.InitPoint.Item1));
+                    i = randomPoint;
+                    //check left, right, up and down cells, if only one is a wall, create a door between them
+                    if (matrix[i - 1, splitPoint] == 1 && matrix[i + 1, splitPoint] == 2 && matrix[i, splitPoint - 1] == 2 && matrix[i, splitPoint + 1] == 2)
+                    {
+                        matrix[i, splitPoint] = 3;
+                        matrix[i, splitPoint + 1] = 3;
+                    }
+                    else if (matrix[i + 1, splitPoint] == 1 && matrix[i - 1, splitPoint] == 2 && matrix[i, splitPoint - 1] == 2 && matrix[i, splitPoint + 1] == 2)
+                    {
+                        matrix[i, splitPoint] = 3;
+                        matrix[i, splitPoint + 1] = 3;
+                    }
+                    else if (matrix[i, splitPoint - 1] == 1 && matrix[i, splitPoint + 1] == 2 && matrix[i - 1, splitPoint] == 2 && matrix[i + 1, splitPoint] == 2)
+                    {
+                        matrix[i, splitPoint] = 3;
+                        matrix[i, splitPoint + 1] = 3;
+                    }
+                    else if (matrix[i, splitPoint + 1] == 1 && matrix[i, splitPoint - 1] == 2 && matrix[i - 1, splitPoint] == 2 && matrix[i + 1, splitPoint] == 2)
+                    {
+                        matrix[i, splitPoint] = 3;
+                        matrix[i, splitPoint + 1] = 3;
+                    }
+                    else
+                    {
+                        matrix[i, splitPoint] = 1;
+                        matrix[i, splitPoint + 1] = 1;
+
+                        //move the iteration to the left to create a door
+                        matrix[i-1, splitPoint] = 3;
+                        matrix[i-1, splitPoint + 1] = 3;
+
+                    }
+                }else*/
                 {
                     matrix[i, splitPoint] = 1;
                     matrix[i, splitPoint + 1] = 1;
@@ -271,6 +343,40 @@ namespace SpaceOptimization.BSP
                     matrix[i, j] = 2;
                 }
             }
+        }
+        void RandomDoors(int[,] matrix)
+        {
+            var random = new System.Random();
+            // make doors in the walls until al rooms are connected
+            for (int i = 1; i < matrix.GetLength(0)-2; i++)
+            { 
+                for(int j = 1; j < matrix.GetLength(1)-2; j++)
+                {
+                    var probability = random.Next(0, 100);
+                    if (probability < 30) continue;
+
+                    //check if the cell is a wall
+                    if (matrix[i - 1, j] == 3 || matrix[i + 1, j] == 3 || matrix[i, j - 1] == 3 || matrix[i, j + 1] == 3)
+                    {
+                        continue;
+                    }
+
+                    //check if next 2 cells are walls and actual cell is a floor
+                    if (matrix[i, j] == 2 && matrix[i, j + 1] == 1 && matrix[i, j + 2] == 1 && matrix[i-1,j+2] == 1 && matrix[i+1,j+2] == 1)
+                    {
+                        matrix[i, j + 1] = 3;
+                        matrix[i, j + 2] = 3;
+                    }
+                    if (matrix[i, j] == 2 && matrix[i + 1, j] == 1 && matrix[i + 2, j] == 1 && matrix[i + 2, j-1] == 1 && matrix[i + 2, j+1] == 1)
+                    {
+                        matrix[i + 1, j] = 3;
+                        matrix[i + 2, j] = 3;
+                    }
+
+                }
+                
+            }
+
         }
 
     }
