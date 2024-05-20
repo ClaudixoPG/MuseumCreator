@@ -64,8 +64,8 @@ namespace SpaceOptimization.BSP
             Node root = new Node(new Tuple<int, int>(0, 0), new Tuple<int, int>(matrix.GetLength(0) - 1, matrix.GetLength(1) - 1));
             Split(matrix, root);
             //CreateHallway(matrix, root);
-            RandomDoors(matrix);
-
+            //RandomDoors(matrix);
+            IntercalatedDoors(matrix);
             //Write Matrix to file in var path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".txt";
             string path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".txt";
             WriteMatrixToFile(matrix, path);
@@ -344,40 +344,71 @@ namespace SpaceOptimization.BSP
                 }
             }
         }
-        void RandomDoors(int[,] matrix)
+
+        void IntercalatedDoors(int[,] matrix)
         {
-            var random = new System.Random();
-            // make doors in the walls until al rooms are connected
-            for (int i = 1; i < matrix.GetLength(0)-2; i++)
-            { 
-                for(int j = 1; j < matrix.GetLength(1)-2; j++)
+            for (int i = 1; i < matrix.GetLength(0) - 1; i++)
+            {
+                //Horizontal doors
+                for (int j = 1; j < matrix.GetLength(1) - 1; j++)
                 {
-                    var probability = random.Next(0, 100);
-                    if (probability < 30) continue;
+                    var actualCell = matrix[i, j];
+                    var rightCell = matrix[i, j + 1];
+                    var actualUpCell = matrix[i - 1, j];
+                    var actualDownCell = matrix[i + 1, j];
+                    var rightUpCell = matrix[i - 1, j + 1];
+                    var rightDownCell = matrix[i + 1, j + 1];
 
-                    //check if the cell is a wall
-                    if (matrix[i - 1, j] == 3 || matrix[i + 1, j] == 3 || matrix[i, j - 1] == 3 || matrix[i, j + 1] == 3)
+                    //check if 2 walls are in the same row 
+                    //if (matrix[i,j] == 1 && matrix[i,j+1] == 1)
+                    if (actualCell == 1 && actualUpCell == 1 && actualDownCell == 1 &&
+                        rightCell == 1 && rightUpCell == 1 && rightDownCell == 1)
                     {
-                        continue;
+                        var leftCell = matrix[i, j - 1];
+                        var twoLeftCell = matrix[i, j + 2];
+                        //check if the cell in the left is a floor and the cell in the right is a wall
+                        //if (matrix[i,j-1] == 2 && matrix[i,j+2] == 2)
+                        if (leftCell == 2 && twoLeftCell == 2)
+                        {
+                            Debug.Log("Horizontal Door");
+                            //valid door
+                            matrix[i, j] = 3;
+                            matrix[i, j + 1] = 3;
+                        }
                     }
-
-                    //check if next 2 cells are walls and actual cell is a floor
-                    if (matrix[i, j] == 2 && matrix[i, j + 1] == 1 && matrix[i, j + 2] == 1 && matrix[i-1,j+2] == 1 && matrix[i+1,j+2] == 1)
-                    {
-                        matrix[i, j + 1] = 3;
-                        matrix[i, j + 2] = 3;
-                    }
-                    if (matrix[i, j] == 2 && matrix[i + 1, j] == 1 && matrix[i + 2, j] == 1 && matrix[i + 2, j-1] == 1 && matrix[i + 2, j+1] == 1)
-                    {
-                        matrix[i + 1, j] = 3;
-                        matrix[i + 2, j] = 3;
-                    }
-
                 }
-                
             }
 
-        }
+            for (int i = 1; i < matrix.GetLength(0) - 2; i++)
+            {
+                //Vertical doors
+                for (int j = 1; j < matrix.GetLength(1) - 2; j++)
+                {
+                    var actualCell = matrix[i, j];
+                    var downCell = matrix[i + 1, j];
+                    var actualRightCell = matrix[i, j + 1];
+                    var actualLeftCell = matrix[i, j - 1];
+                    var downRightCell = matrix[i + 1, j + 1];
+                    var downLeftCell = matrix[i + 1, j - 1];
 
+                    //check if 2 walls are in the same column
+                    if (actualCell == 1 && actualLeftCell == 1 && actualRightCell == 1 &&
+                        downCell == 1 && downRightCell == 1 && downLeftCell == 1)
+                    {
+                        var upCell = matrix[i - 1, j];
+                        var DownCell2 = matrix[i + 2, j];
+                        //check if the cell in the up is a floor and the cell in the down is a wall
+                        if (upCell == 2 && DownCell2 == 2)
+                        {
+                            Debug.Log("Vertical Door");
+                            //valid door
+                            matrix[i, j] = 3;
+                            matrix[i + 1, j] = 3;
+                        }
+                    }
+                }
+            }
+            
+        }
     }
 }

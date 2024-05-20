@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using TMPro;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 namespace SpaceOptimization
@@ -15,38 +17,21 @@ namespace SpaceOptimization
         int cols;
         bool[,] visited;
         Dictionary<int, Room> rooms = new Dictionary<int, Room>();
-        public GameObject weightCanvas ;
+        public GameObject weightCanvas;
         int[] distribution;
+        float scale = 10f;
 
         public void TSP(int[,] matrix)//, TSPSolver solver = TSPSolver.instance)
         {
-
-            //Identify the rooms in the matrix
             InitializeData(matrix);
             IdentifyRooms();
-            //PrintRoomsCoordinates();
-
-            //Load a distribution of artworks from a file
             LoadChromosome();
-
             ReconstructMatrix();
-
-
-            //PrintGraph();
-            
-            //InstantiateTheData();
-            
-            //Save the graph in a file
-
             IdentifyConnections();
-            
-            //Create the graph new knew the rooms and the connections between them, and number of artworks in each room
             CreateTheGraph();
-            //SaveGraph(rooms);
-            //solver.Calculate();
+            DistanceBetweenDoors(matrix);
+
         }
-
-
         void LoadChromosome()
         {
             //Load the chromosome from the file
@@ -54,23 +39,21 @@ namespace SpaceOptimization
             string[] lines = File.ReadAllLines(path);
             string[] values = lines[0].Split(';');
             distribution = new int[values.Length];
-            for(int i = 0; i < values.Length; i++)
+            for (int i = 0; i < values.Length; i++)
             {
                 distribution[i] = int.Parse(values[i]);
             }
         }
-
-
         void InitializeData(int[,] matrix)
         {
             this.matrix = matrix;
-            for(int i = 0;i < matrix.GetLength(0);i++)
+            for (int i = 0; i < matrix.GetLength(0); i++)
             {
-                for(int j = 0;j < matrix.GetLength(1);j++)
+                for (int j = 0; j < matrix.GetLength(1); j++)
                 {
-                    if (matrix[i,j] == 3)
+                    if (matrix[i, j] == 3)
                     {
-                        matrix[i, j] = 999;
+                        matrix[i, j] = -1;
                     }
                 }
             }
@@ -97,117 +80,117 @@ namespace SpaceOptimization
                 }
             }
         }
+        /// <summary>
+        /// Recognize the connections between rooms and store them in the rooms dictionary
+        /// </summary>
         void IdentifyConnections()
         {
-            //print matrix
-            for (int i = 0; i < rows; i++)
+            //Identify connections from left to right and top to bottom
+            for (int i = 0; i < rows - 1; i++)
             {
-                string row = "";
-                for (int j = 0; j < cols; j++)
+                for (int j = 0; j < cols - 1; j++)
                 {
-                    row += matrix[i, j] + " ";
-                }
-                Debug.Log(row);
-            }
-
-            // Identify connections
-            for (int i = 1; i < rows -1; i++)
-            {
-                for (int j = 1; j < cols -1; j++)
-                {
-                    if (matrix[i, j] == 999) // Check if it is a door and get the connected rooms
+                    //Draw a line if 2 doors are connected
+                    if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
                     {
-                        var connectedRooms = GetConnectedRooms(i, j);
-                        
-                        if (connectedRooms.Item1 != 0 && connectedRooms.Item2 != 0)
-                        {
-                            rooms[connectedRooms.Item1].ConnectedRooms.Add(connectedRooms.Item2);
-                            rooms[connectedRooms.Item2].ConnectedRooms.Add(connectedRooms.Item1);
-                        }
-
-                        /*foreach (var pair in connectedRooms)
-                        {
-                            rooms[pair.Item1].ConnectedRooms.Add(pair.Item2);
-                            rooms[pair.Item2].ConnectedRooms.Add(pair.Item1);
-                        }*/
+                        //Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i, 0, j + 1) * scale, Color.yellow, 1000f);
                     }
-                }
-            }
-        }
-        void PrintRoomsCoordinates()
-        {
-            // Print the rooms coordinates of each node in each room
-            foreach (var room in rooms)
-            {
-                //Debug.Log($"Room {room.Key}: x={room.Value.x}, y={room.Value.y}, width={room.Value.width}, height={room.Value.height}");
-                foreach (var node in room.Value.nodes)
-                {
-                    Debug.Log("Room " + room.Key + " Node: " + node.Position);
-                }
-            }
-        }
-        void PrintGraph()
-        {
-            // Print the graph
-            foreach (var room in rooms)
-            {
-                Debug.Log("Room " + room.Key + " is connected to rooms: ");
-                foreach (var connectedRoom in room.Value.ConnectedRooms)
-                {
-                    Debug.Log(connectedRoom);
-                }
-            }
-        }
+                    if (matrix[i, j] == -1 && matrix[i + 1, j] == -1)
+                    {
+                        //Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i + 1, 0, j) * scale, Color.yellow, 1000f);
+                    }
 
+                    if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
+                    {
+                        var leftRoom = matrix[i, j - 1];
+                        var rightRoom = matrix[i, j + 2];
+
+                        rooms[leftRoom].ConnectedRooms.Add(rightRoom);
+                        rooms[rightRoom].ConnectedRooms.Add(leftRoom);
+                    }
+
+                    if (matrix[i, j] == -1 && matrix[i + 1, j] == -1)
+                    {
+                        var topRoom = matrix[i - 1, j];
+                        var bottomRoom = matrix[i + 2, j];
+
+                        rooms[topRoom].ConnectedRooms.Add(bottomRoom);
+                        rooms[bottomRoom].ConnectedRooms.Add(topRoom);
+
+                    }
+
+                }
+            }
+        }
         void CreateTheGraph()
         {
-
-
             //Create the graph
             foreach (var room in rooms)
             {
+                var initX = room.Value.nodes[0].Position.x;
+                var initY = room.Value.nodes[0].Position.y;
+                var endX = room.Value.nodes[room.Value.nodes.Count - 1].Position.x;
+                var endY = room.Value.nodes[room.Value.nodes.Count - 1].Position.y;
+
+                foreach (var node in room.Value.nodes)
+                {
+                    if(initX > node.Position.x)
+                    {
+                        initX = node.Position.x;
+                    }
+                    if (initY > node.Position.y)
+                    {
+                        initY = node.Position.y;
+                    }
+                    if (endX < node.Position.x)
+                    {
+                        endX = node.Position.x;
+                    }
+                    if (endY < node.Position.y)
+                    {
+                        endY = node.Position.y;
+                    }
+                }
+
+                Vector2 roomMiddlePoint = new Vector2((initX + endX) / 2, (initY + endY) / 2);
+
                 foreach (var connectedRoom in room.Value.ConnectedRooms)
                 {
-                    var weight = CalculateWeightBetweenRooms(room.Value, rooms[connectedRoom]);
-                    Debug.Log("Room " + room.Key + " is connected to room " + connectedRoom + " with weight " + weight);
-                }
+                    var connectedInitX = rooms[connectedRoom].nodes[0].Position.x;
+                    var connectedInitY = rooms[connectedRoom].nodes[0].Position.y;
+                    var connectedEndX = rooms[connectedRoom].nodes[rooms[connectedRoom].nodes.Count - 1].Position.x;
+                    var connectedEndY = rooms[connectedRoom].nodes[rooms[connectedRoom].nodes.Count - 1].Position.y;
 
-                foreach (var connectedRoom in room.Value.ConnectedRooms)
-                {
-                    var x = room.Value.nodes[0].Position.x;
-                    var y = room.Value.nodes[0].Position.y;
-                    var connectedX = rooms[connectedRoom].nodes[0].Position.x;
-                    var connectedY = rooms[connectedRoom].nodes[0].Position.y;
+                    foreach (var node in rooms[connectedRoom].nodes)
+                    {
+                        if (connectedInitX > node.Position.x)
+                        {
+                            connectedInitX = node.Position.x;
+                        }
+                        if (connectedInitY > node.Position.y)
+                        {
+                            connectedInitY = node.Position.y;
+                        }
+                        if (connectedEndX < node.Position.x)
+                        {
+                            connectedEndX = node.Position.x;
+                        }
+                        if (connectedEndY < node.Position.y)
+                        {
+                            connectedEndY = node.Position.y;
+                        }
+                    }
 
-                    var scale = 10f;
+                    Vector2 connectedRoomMiddlePoint = new Vector2((connectedInitX + connectedEndX) / 2, (connectedInitY + connectedEndY) / 2);
 
-                    Debug.DrawLine(new Vector3(x, 0, y) * scale, new Vector3(connectedX, 0, connectedY) * scale, Color.green, 1000f);
+                    //Draw a line between the middle points of the rooms
+                    Debug.DrawLine(new Vector3(roomMiddlePoint.x, 0, roomMiddlePoint.y) * scale, 
+                        new Vector3(connectedRoomMiddlePoint.x, 0, connectedRoomMiddlePoint.y) * scale, 
+                        Color.green, 1000f);
+
                 }
             }
-            //Remove the cases when room is connected to itself
         }
-
-        int CalculateWeightBetweenRooms(Room room1, Room room2)
-        {
-            //Calculate the weight between two rooms
-            int weight = 0;
-            foreach (var node1 in room1.nodes)
-            {
-                if(node1.Occupied)
-                {
-                    weight++;
-                }
-            }
-            foreach (var node2 in room2.nodes)
-            {
-                if (node2.Occupied)
-                {
-                    weight++;
-                }
-            }
-            return weight;
-        }
-
         void ReconstructMatrix()
         {
             var newMatrix = new string[rows, cols];
@@ -257,7 +240,6 @@ namespace SpaceOptimization
             WriteMatrixToFile(newMatrix, path);
 
         }
-
         void WriteMatrixToFile(string[,] matrix, string path)
         {
             if (!File.Exists(path))
@@ -286,13 +268,6 @@ namespace SpaceOptimization
             //Write string builder to file
             File.WriteAllText(path, sb.ToString());
         }
-        void SaveGraph(Dictionary<int, Room> rooms)
-        {
-            string path = "Assets/Graph.txt";
-            //Write some text to the test.txt file
-            StreamWriter writer;
-            writer = new StreamWriter(path, true);
-        }
         //Use DFS to identify rooms given a matrix, identify rooms and assign a room id to each room, besides, store the room's position
         void DFS(int row, int col, int roomId)
         {
@@ -306,9 +281,9 @@ namespace SpaceOptimization
 
             //Save the nodes of the room
             var newNode = new Node(new Vector2Int(row, col));
-        
+
             //add the node to the room only if not already added
-            if(!rooms[roomId].nodes.Contains(newNode))
+            if (!rooms[roomId].nodes.Contains(newNode))
             {
                 rooms[roomId].nodes.Add(newNode);
             }
@@ -317,45 +292,187 @@ namespace SpaceOptimization
             DFS(row - 1, col, roomId);
             DFS(row, col + 1, roomId);
             DFS(row, col - 1, roomId);
-        }   
-
-        //Get the connected rooms of a door
-        Tuple<int, int> GetConnectedRooms(int row, int col)
+        }
+        
+        void DistanceBetweenDoors(int[,] matrix)
         {
-            //Check left to right
-            if (matrix[row,col+1] == 999)
+            //Calculate the distance between doors
+            Graph graph = new Graph(matrix);
+            foreach(var room in rooms)
             {
-                //connectedRooms.Add(Tuple.Create(matrix[row, col - 1], matrix[row, col + 2]));
-                return Tuple.Create(matrix[row, col - 1], matrix[row, col + 2]);
-            }
-            //Check right to left
-            if (matrix[row, col - 1] == 999)
-            {
-                //connectedRooms.Add(Tuple.Create(matrix[row, col + 1], matrix[row, col - 2]));
-                return Tuple.Create(matrix[row, col + 1], matrix[row, col - 2]);
-            }
-            //Check top to bottom
-            if (matrix[row + 1, col] == 999)
-            {
-                //connectedRooms.Add(Tuple.Create(matrix[row - 1, col], matrix[row + 2, col]));
-                return Tuple.Create(matrix[row - 1, col], matrix[row + 2, col]);
-            }
-            //Check bottom to top
-            if (matrix[row - 1, col] == 999)
-            {
-                //connectedRooms.Add(Tuple.Create(matrix[row + 1, col], matrix[row - 2, col]));
-                return Tuple.Create(matrix[row + 1, col], matrix[row - 2, col]);
-            }
+                List<Node> doorsInRoom = new List<Node>();
 
-            return Tuple.Create(0, 0);
+                foreach (var node in room.Value.nodes)
+                {
+                    //Get lateral nodes of the current node
+                    Node leftNode = new Node(new Vector2Int(node.Position.x, node.Position.y - 1));
+                    Node rightNode = new Node(new Vector2Int(node.Position.x, node.Position.y + 1));
+                    Node topNode = new Node(new Vector2Int(node.Position.x - 1, node.Position.y));
+                    Node bottomNode = new Node(new Vector2Int(node.Position.x + 1, node.Position.y));
+
+                    //check if node around (4 connected) is a door, if so, add it to the list
+                    if(!doorsInRoom.Contains(leftNode) && matrix[leftNode.Position.x, leftNode.Position.y] == -1)
+                    {
+                        doorsInRoom.Add(leftNode);
+                    }
+                    if (!doorsInRoom.Contains(rightNode) && matrix[rightNode.Position.x, rightNode.Position.y] == -1)
+                    {
+                        doorsInRoom.Add(rightNode);
+                    }
+                    if (!doorsInRoom.Contains(topNode) && matrix[topNode.Position.x, topNode.Position.y] == -1)
+                    {
+                        doorsInRoom.Add(topNode);
+                    }
+                    if (!doorsInRoom.Contains(bottomNode) && matrix[bottomNode.Position.x, bottomNode.Position.y] == -1)
+                    {
+                        doorsInRoom.Add(bottomNode);
+                    }
+                }
+
+                //Draw the lines between the doors
+                for (int i = 0; i < doorsInRoom.Count; i++)
+                {
+                    for (int j = 0; j < doorsInRoom.Count; j++)
+                    {
+                        var city1 = graph.cities.Find(city => city.x == doorsInRoom[i].Position.x && city.y == doorsInRoom[i].Position.y);
+                        var city2 = graph.cities.Find(city => city.x == doorsInRoom[j].Position.x && city.y == doorsInRoom[j].Position.y);
+
+                        if (city1 == null || city2 == null)
+                        {
+                            continue;
+                        }
+
+                        var distance = Mathf.Abs(city1.x - city2.x) + Mathf.Abs(city1.y - city2.y);
+                        Debug.DrawLine(new Vector3(city1.x, 0, city1.y) * scale, 
+                            new Vector3(city2.x, 0, city2.y) * scale, Color.yellow, 1000f);
+                        graph.edges.Add(new Edge { StartCity = city1, EndCity = city2, weight = distance });
+                    }
+                }
+
+                
+            }
+            
+            int[,] distanceMatrix = graph.GraphToDistanceMatrix();
+            ACO_TSP aco_TSP = new ACO_TSP(graph.cities.Count/2, 10, 1.0f, 2.0f);
+            aco_TSP.Solver(distanceMatrix);
+
+            //SA_TSP(graph.GraphToDistanceMatrix());
         }
 
+        class Graph
+        {
+            public List<City> cities = new List<City>();
+            public List<Edge> edges = new List<Edge>();
+
+            public Graph(int[,]matrix)
+            {
+                DetectCities(matrix);
+            }
+            public void DetectCities(int[,] matrix)
+            {
+                int cityId = 0;
+
+                //Save each door as a city in the graph, if 2 doors are connected, save them with the same id (horizontal)
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
+                        {
+                            City firstHalfCity = new City { id = cityId, x = i, y = j };
+                            City secondHalfCity = new City { id = cityId, x = i, y = j + 1 };
+
+                            //Check if the nodes are already added to the graph, using find method to check if the city is already in the list
+                            if (!cities.Exists(city => city.x == firstHalfCity.x && city.y == firstHalfCity.y))
+                            {
+                                cities.Add(firstHalfCity);
+                                cities.Add(secondHalfCity);
+                                cityId++;
+                            }
+                        }
+                    }
+                }
+
+                //Save each door as a city in the graph, if 2 doors are connected, save them with the same id (vertical)
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        if (matrix[i, j] == -1 && matrix[i + 1, j] == -1)
+                        {
+                            City firstHalfCity = new City { id = cityId, x = i, y = j };
+                            City secondHalfCity = new City { id = cityId, x = i + 1, y = j };
+
+                            //Check if the nodes are already added to the graph, using find method to check if the city is already in the list
+                            if (!cities.Exists(city => city.x == firstHalfCity.x && city.y == firstHalfCity.y))
+                            {
+                                cities.Add(firstHalfCity);
+                                cities.Add(secondHalfCity);
+                                cityId++;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            public void PrintGraph()
+            {
+                /*foreach (var city in cities)
+                {
+                    Debug.Log("City: " + city.id + " x: " + city.x + " y: " + city.y);
+                }*/
+
+                foreach (var edge in edges)
+                {
+                    Debug.Log("City: " + edge.StartCity.id + "is connected with" + edge.EndCity.id + " and their distance are" + edge.weight);
+                    //Debug.Log("Edge: " + edge.StartCity.id + " " + edge.EndCity.id + " " + edge.weight);
+                }
+            }
+
+            public int[,] GraphToDistanceMatrix()
+            { 
+                var n = cities.Count/2;
+
+                int[,] distanceMatrix = new int[n, n];
+
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        distanceMatrix[i, j] = int.MaxValue;
+                    }
+                }
+                
+                foreach (var edge in edges)
+                {
+                    distanceMatrix[edge.StartCity.id, edge.EndCity.id] = edge.weight;
+                }
+
+                return distanceMatrix;
+            }
+        }
+        
+        class City
+        {
+            public int id;
+            public int x;
+            public int y;
+        }
+        
+        class Edge
+        {
+            public City StartCity;
+            public City EndCity;
+            public int weight;
+        }
+        
+        
         class Room
         {
             public List<int> ConnectedRooms { get; set; } = new List<int>();
             public List<Node> nodes = new List<Node>();
-        }
-
+        } 
         class Node
         {
             public Vector2Int Position { get; set; }
@@ -368,3 +485,5 @@ namespace SpaceOptimization
 
     }
 }
+
+

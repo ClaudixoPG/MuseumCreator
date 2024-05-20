@@ -2,15 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ACO_TSP : MonoBehaviour
+public class ACO_TSP
 {
     //Use Ant Colony Optimization to solve the Traveling Salesman Problem
 
     //Parameters
-    public int n = 5; //Number of cities
-    public int m = 5; //Number of ants
-    public float alpha = 1.0f; //Pheromone factor
-    public float beta = 2.0f; //Distance factor
+    private int n = 5; //Number of cities
+    private int m = 5; //Number of ants
+    private float alpha = 1.0f; //Pheromone factor
+    private float beta = 2.0f; //Distance factor
+
+    public ACO_TSP(int numCities, int numAnts, float pheromoneFactor, float distanceFactor)
+    {
+        n = numCities;
+        m = numAnts;
+        alpha = pheromoneFactor;
+        beta = distanceFactor;
+    }
 
     //Define the distance matrix
     public int[,] distanceMatrix;
@@ -184,10 +192,9 @@ public class ACO_TSP : MonoBehaviour
 
         return pheromoneMatrix;
     }
-
-    private void Start()
+    public void Solver(int[,] distanceMatrix)
     {
-        distanceMatrix = DistanceMatrix(n);
+        //distanceMatrix = DistanceMatrix(n);
 
         //print distance matrix
         for (int i = 0; i < n; i++)
