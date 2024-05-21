@@ -3,8 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SA_TSP : MonoBehaviour
+public class SA_TSP
 {
+    private int n = 5; //Number of cities
+    private int maxIteration = 1000;
+    private float initialTemperature = 1.0f;
+    private float coolingRate = 0.001f;
+
+    public SA_TSP(int numCities, int maxIter, float initTemp, float coolRate)
+    {
+        n = numCities;
+        maxIteration = maxIter;
+        initialTemperature = initTemp;
+        coolingRate = coolRate;
+    }
+
     //Define the distance matrix
     public int[,] distanceMatrix;
     private int[,] DistanceMatrix(int n)
@@ -123,13 +136,12 @@ public class SA_TSP : MonoBehaviour
         }
         return new Tuple<List<int>, float>(bestPath, bestDistance);
     }
-
-    private void Start()
+    public Tuple<string,int,List<int>,double> Solver(int[,] distanceMatrix)
     {
-        var n = 5;
-        distanceMatrix = DistanceMatrix(n);
+        //var n = 5;
+        //distanceMatrix = DistanceMatrix(n);
         //print distance matrix
-        for (int i = 0; i < n; i++)
+        /*for (int i = 0; i < n; i++)
         {
             string row = "";
             for (int j = 0; j < n; j++)
@@ -137,15 +149,18 @@ public class SA_TSP : MonoBehaviour
                 row += distanceMatrix[i, j] + " ";
             }
             Debug.Log(row);
-        }
+        }*/
 
-        var maxIteration = 1000;
-        var initialTemperature = 1.0f;
-        var coolingRate = 0.001f;
+        var time = System.DateTime.Now;
         var result = SimulatedAnnealing(distanceMatrix, maxIteration, initialTemperature, coolingRate);
         simulatedAnnealingPath = result.Item1;
         totalDistance = result.Item2;
-        Debug.Log("Simulated Annealing Path: " + string.Join("->", simulatedAnnealingPath.ToArray()) + " Total Distance: " + totalDistance);
+        //Debug.Log("Simulated Annealing Path: " + string.Join("->", simulatedAnnealingPath.ToArray()) + " Total Distance: " + totalDistance);
+        var time2 = System.DateTime.Now;
+
+        var timeElapsed = (time2 - time).TotalMilliseconds;
+
+        return Tuple.Create("SA",(int)totalDistance, simulatedAnnealingPath,timeElapsed);
     }
 
 }

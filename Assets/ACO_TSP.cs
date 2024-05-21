@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public class ACO_TSP
 {
@@ -41,7 +43,7 @@ public class ACO_TSP
         {
             for (int j = i+1; j < n; j++)
             {
-                distanceMatrix[i, j] = distanceMatrix[j,i] = Random.Range(1, 10);
+                distanceMatrix[i, j] = distanceMatrix[j,i] = UnityEngine.Random.Range(1, 10);
             }
         }
         return distanceMatrix;
@@ -120,7 +122,7 @@ public class ACO_TSP
             visited[i] = false;
         }
 
-        var Start = Random.Range(0, n);
+        var Start = UnityEngine.Random.Range(0, n);
         antTour.Add(Start);
         visited[Start] = true;
 
@@ -192,12 +194,12 @@ public class ACO_TSP
 
         return pheromoneMatrix;
     }
-    public void Solver(int[,] distanceMatrix)
+    public Tuple<string,int,List<int>,double> Solver(int[,] distanceMatrix)
     {
         //distanceMatrix = DistanceMatrix(n);
 
         //print distance matrix
-        for (int i = 0; i < n; i++)
+        /*for (int i = 0; i < n; i++)
         {
             string row = "";
             for (int j = 0; j < n; j++)
@@ -205,7 +207,9 @@ public class ACO_TSP
                 row += distanceMatrix[i, j] + " ";
             }
             Debug.Log(row);
-        }
+        }*/
+        
+        var time = System.DateTime.Now;
 
         pheromoneMatrix = PheromoneMatrix(n);
         List<int> bestTour = new List<int>();
@@ -230,8 +234,14 @@ public class ACO_TSP
             }
             pheromoneMatrix = UpdatePheromone(n, pheromoneMatrix, distanceMatrix, antList);
         }
-        Debug.Log("Best Tour: " + string.Join(",", bestTour.ToArray()));
-        Debug.Log("Best Tour Length: " + bestTourLength);
 
+        var time2 = System.DateTime.Now;
+
+        //time on ms
+        var timeElapsed = (time2 - time).TotalMilliseconds;
+
+        //Debug.Log("Best Tour: " + string.Join(",", bestTour.ToArray()));
+        //Debug.Log("Best Tour Length: " + bestTourLength);
+        return Tuple.Create("ACO",bestTourLength, bestTour, timeElapsed);
     }
 }

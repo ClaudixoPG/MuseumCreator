@@ -420,8 +420,6 @@ GameObject:
   - component: {fileID: 1721692097}
   - component: {fileID: 1721692098}
   - component: {fileID: 1721692099}
-  - component: {fileID: 1721692101}
-  - component: {fileID: 1721692102}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -536,34 +534,6 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5bcfa0dca2c6fd34496f1dd42ca9f9c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1721692101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1721692089}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f0334ce62556f0419e4cd7c635655f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  totalDistance: 0
-  initialPath: 
-  acceptanceProbability: 0
-  simulatedAnnealingPath: 
---- !u!114 &1721692102
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1721692089}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a09ebb0592fe9e94c9daeba4cda4bf75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1755718384
@@ -1227,7 +1197,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6034040048595355753, guid: c529f5ecbdffdb048bc64de15e8a8593, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00035985257
+      value: 0.0006692476
       objectReference: {fileID: 0}
     - target: {fileID: 6034040048793707152, guid: c529f5ecbdffdb048bc64de15e8a8593, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1431,7 +1401,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7406682474556815848, guid: c529f5ecbdffdb048bc64de15e8a8593, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0005047241
+      value: 0.0008570934
       objectReference: {fileID: 0}
     - target: {fileID: 7645582108685822474, guid: c529f5ecbdffdb048bc64de15e8a8593, type: 3}
       propertyPath: m_AnchorMax.y

@@ -3,9 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 namespace SpaceOptimization
@@ -352,11 +349,117 @@ namespace SpaceOptimization
                 
             }
             
+            //Calculate the distance matrix
             int[,] distanceMatrix = graph.GraphToDistanceMatrix();
-            ACO_TSP aco_TSP = new ACO_TSP(graph.cities.Count/2, 10, 1.0f, 2.0f);
-            aco_TSP.Solver(distanceMatrix);
+            //Create a list of solvers data
+            List<Tuple<string,int, List<int>,double>> solversData = new List<Tuple<string,int, List<int>,double>>();
 
-            //SA_TSP(graph.GraphToDistanceMatrix());
+            //Initialize the solvers
+            ACO_TSP aco_TSP = new ACO_TSP(graph.cities.Count/2, 10, 1.0f, 2.0f);
+            SA_TSP sa_TSP = new SA_TSP(graph.cities.Count/2, 1000, 1.0f, 0.001f);
+            PSO_TSP pSO_TSP = new PSO_TSP(graph.cities.Count/2,10,100,0.5f,0.7f,1.5f,1.5f);
+
+            //experiment with the solvers
+            int iterations = 100;
+
+            for(int i = 0; i < iterations; i++)
+            {
+                //Get the solvers data
+                var acoSolver = aco_TSP.Solver(distanceMatrix);
+                var saSolver = sa_TSP.Solver(distanceMatrix);
+                var psoSolver = pSO_TSP.Solver(distanceMatrix);
+
+                //Add the solvers data to the list
+                solversData.Add(acoSolver);
+                solversData.Add(saSolver);
+                solversData.Add(psoSolver);
+                SaveTSPData(distanceMatrix, solversData,1, "TSP_DATA_"+matrix.GetLength(0)+"x"+matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
+                solversData.Clear();
+            }
+            //Get the solvers data
+            /*var acoSolver = aco_TSP.Solver(distanceMatrix);
+            var saSolver = sa_TSP.Solver(distanceMatrix);
+            var psoSolver = pSO_TSP.Solver(distanceMatrix);
+            
+            //Add the solvers data to the list
+            solversData.Add(acoSolver);
+            solversData.Add(saSolver);
+            solversData.Add(psoSolver);*/
+            //Save the data to a file
+            //SaveTSPData(distanceMatrix,solversData, 1,1,"TSP_DATA_20x20"); //aco_TSP.executionTime, aco_TSP.iterations);
+            Debug.Log("Saved Data");
+        }
+
+        void SaveTSPData(int[,]distanceMatrix,List<Tuple<string,int,List<int>,double>> data,int interations,string filename = "TSP_Data")
+        {
+            //Save the rooms data to a file
+            string path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".csv";
+
+            if (!File.Exists(path))
+            {
+                //Create the file if it doesn't exist and write the header
+                File.Create(path).Dispose();
+            }
+
+            //use writer to write the data to the file, first line have the values TourLength, Tour, ExecutionTime, Iterations, 
+            using (StreamWriter writer = new StreamWriter(path,append:true))
+            {
+                //check if first line is empty, if so, write the header
+                if (new FileInfo(path).Length == 0)
+                {
+                    string header = "Matrix Width;Matrix Height;Distance Matrix;";
+
+                    foreach (var item in data)
+                    {
+                        //if item is the last one, don't add the separator
+                        if (item.Equals(data[data.Count - 1]))
+                        {
+                            header += item.Item1 + "TourLength" + ";" + item.Item1 + "Tour" + ";" + item.Item1 + "ExecutionTime" + ";" + item.Item1 + "Iterations";
+                        }
+                        else
+                        {
+                            header += item.Item1 + "TourLength" + ";" + item.Item1 + "Tour" + ";" + item.Item1 + "ExecutionTime" + ";" + item.Item1 + "Iterations;";
+                        }
+                    }
+                    writer.WriteLine(header);
+                }
+                
+                string matrixWidth = distanceMatrix.GetLength(0).ToString();
+                string matrixHeight = distanceMatrix.GetLength(1).ToString();
+                string matrixAsString = "";
+                for (int i = 0; i < distanceMatrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < distanceMatrix.GetLength(1); j++)
+                    {
+                        //if it is the last element, don't add the separator
+                        if (i == distanceMatrix.GetLength(0) - 1 && j == distanceMatrix.GetLength(1) - 1)
+                        {
+                            matrixAsString += distanceMatrix[i, j];
+                        }
+                        else
+                        {
+                            matrixAsString += distanceMatrix[i, j] + ",";
+                        }
+                    }
+                }
+
+                var line = matrixWidth + ";" + matrixHeight + ";" + matrixAsString + ";";
+
+                foreach (var item in data)
+                {
+                    //if item is the last one, don't add the separator
+                    if (item.Equals(data[data.Count - 1]))
+                    {
+                        line += item.Item2 + ";" + string.Join(",", item.Item3) + ";" + item.Item4 + ";" + interations;
+                    }
+                    else
+                    {
+                        line += item.Item2 + ";" + string.Join(",", item.Item3) + ";" + item.Item4 + ";" + interations + ";";
+                    }
+                }
+                writer.WriteLine(line);
+            }
+
         }
 
         class Graph
@@ -440,7 +543,8 @@ namespace SpaceOptimization
                 {
                     for (int j = 0; j < n; j++)
                     {
-                        distanceMatrix[i, j] = int.MaxValue;
+                        //distanceMatrix[i, j] = int.MaxValue;
+                        distanceMatrix[i, j] = 100;
                     }
                 }
                 

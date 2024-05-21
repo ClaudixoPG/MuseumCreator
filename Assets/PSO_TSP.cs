@@ -4,189 +4,157 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PSO_TSP : MonoBehaviour
+public class PSO_TSP
 {
-    int num_cities = 10;
-    int num_particles = 10;
-    int num_iterations = 1000;
+    private int numCities = 10;
+    private int numParticles = 10;
+    private int numIterations = 100;
+    private double maxVelocity = 0.5;
+    private double w = 0.7;
+    private double c1 = 1.5;
+    private double c2 = 1.5;
 
-    float max_velocity = 1.0f;
-    float w = 0.5f;
-    float c1 = 0.8f;
-    float c2 = 0.9f;
-
-
-    //Define the distance matrix
-    public int[,] distanceMatrix;
-    private int[,] DistanceMatrix(int n)
+    private int GetNumCities()
     {
-        //Create a new distance matrix
-        distanceMatrix = new int[n, n];
-
-        //Initialize matrix with 0 values
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                distanceMatrix[i, j] = 0;
-            }
-        }
-
-        //Fill the distance matrix with random values
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = i + 1; j < n; j++)
-            {
-                distanceMatrix[i, j] = distanceMatrix[j, i] = UnityEngine.Random.Range(1, 10);
-            }
-        }
-        return distanceMatrix;
+        return numCities;
     }
 
-    public class Particle
+    public PSO_TSP(int numCities, int numParticles, int numIterations, float maxVelocity, float inertia, float cognitive, float social)
     {
-        public int numCities;
-        public List<int> position;
-        public List<double> velocity;
-        public List<int> bestPosition;
-        public float pBest = float.MaxValue;
-        public float currentDistance;
+        this.numCities = numCities;
+        this.numParticles = numParticles;
+        this.numIterations = numIterations;
+        this.maxVelocity = maxVelocity;
+        this.w = inertia;
+        this.c1 = cognitive;
+        this.c2 = social;
+    }
+    class Particle
+    {
+        public int[] Position { get; set; }
+        public double[] Velocity { get; set; }
+        public int[] PBestPosition { get; set; }
+        public double PBestValue { get; set; }
+        public double Value { get; set; }
 
         public Particle(int numCities)
         {
-            this.numCities = numCities;
-            var random = new System.Random();
-            position = Enumerable.Range(0, numCities).OrderBy(x => random.Next()).ToList();
-            velocity = new List<double>(numCities);
-            for (int i = 0; i < numCities; i++)
-            {
-                velocity.Add(random.NextDouble());
-            }
-            bestPosition = new List<int>();
-            currentDistance = 0;
+            Position = Enumerable.Range(0, numCities).OrderBy(x => Guid.NewGuid()).ToArray();
+            Velocity = new double[numCities];
+            PBestPosition = (int[])Position.Clone();
+            PBestValue = double.MaxValue;
         }
+
         public void Evaluate(int[,] distanceMatrix)
         {
-            currentDistance = 0;
-            for (int i = 0; i < numCities - 1; i++)
+            Value = 0;
+            for (int i = 0; i < Position.Length - 1; i++)
             {
-                currentDistance += distanceMatrix[position[i], position[i + 1]];
+                Value += distanceMatrix[Position[i], Position[i + 1]];
             }
-            currentDistance += distanceMatrix[position[numCities - 1], position[0]];
-            
-            if (currentDistance < pBest)
+            Value += distanceMatrix[Position[Position.Length - 1], Position[0]];
+
+            if (Value < PBestValue)
             {
-                pBest = currentDistance;
-                bestPosition = new List<int>(position);
-                //position.CopyTo(bestPosition.ToArray());
+                PBestValue = Value;
+                PBestPosition = (int[])Position.Clone();
             }
         }
     }
 
-    public class Swarm
+    class Swarm
     {
-        public int particleCount;
-        public int numCities;
-        public List<Particle> particles;
-        public float gBest = float.MaxValue;
-        public List<int> gBestPosition;
+        public List<Particle> Particles { get; set; }
+        public double GBestValue { get; set; }
+        public int[] GBestPosition { get; set; }
 
-        public Swarm(int particleCount, int numCities)
+        public Swarm(int numParticles, int numCities)
         {
-            this.particleCount = particleCount;
-            this.numCities = numCities;
-            particles = new List<Particle>();
-            gBest = float.MaxValue;
-            var random = new System.Random();
-            gBestPosition = Enumerable.Range(0, numCities).OrderBy(x => random.Next()).ToList();
+            Particles = new List<Particle>();
+            GBestValue = double.MaxValue;
+            GBestPosition = new int[numCities];
+
+            for (int i = 0; i < numParticles; i++)
+            {
+                Particles.Add(new Particle(numCities));
+            }
         }
 
         public void Evaluate(int[,] distanceMatrix)
         {
-            foreach (Particle particle in particles)
+            foreach (var particle in Particles)
             {
                 particle.Evaluate(distanceMatrix);
-                if (particle.pBest < gBest)
+                if (particle.Value < GBestValue)
                 {
-                    gBest = particle.currentDistance;
-                    particle.bestPosition = new List<int>(particle.position);
+                    GBestValue = particle.Value;
+                    GBestPosition = (int[])particle.Position.Clone();
                 }
             }
         }
 
-        public void Update(float w, float c1, float c2, float maxVelocity)
+        public void Update(double w, double c1, double c2, double maxVelocity, int numCities)
         {
-            foreach (Particle particle in particles)
+            System.Random random = new System.Random();
+            foreach (var particle in Particles)
             {
-                for (int i = 0; i < numCities; i++)
+                for (int i = 0; i < particle.Position.Length; i++)
                 {
-                    float r1 = UnityEngine.Random.Range(0.0f, 1.0f);
-                    float r2 = UnityEngine.Random.Range(0.0f, 1.0f);
-                    particle.velocity[i] = (w * particle.velocity[i] + c1 * r1 * (particle.bestPosition[i] - particle.position[i]) + c2 * r2 * (gBestPosition[i] - particle.position[i]));
-                    
-                    if (particle.velocity[i] > maxVelocity)
-                    {
-                        particle.velocity[i] = (int)maxVelocity;
-                    }
-                    else if (particle.velocity[i] < -maxVelocity)
-                    {
-                        particle.velocity[i] = (int)-maxVelocity;
-                    }
+                    double r1 = random.NextDouble();
+                    double r2 = random.NextDouble();
+
+                    particle.Velocity[i] = w * particle.Velocity[i] + c1 * r1 * (particle.PBestPosition[i] - particle.Position[i]) + c2 * r2 * (GBestPosition[i] - particle.Position[i]);
+
+                    if (particle.Velocity[i] > maxVelocity)
+                        particle.Velocity[i] = maxVelocity;
+                    if (particle.Velocity[i] < -maxVelocity)
+                        particle.Velocity[i] = -maxVelocity;
                 }
 
-                for (int i = 0; i < numCities; i++)
+                for (int i = 0; i < particle.Position.Length; i++)
                 {
-                    particle.position[i] += (int)(particle.velocity[i]);
-                    if (particle.position[i] >= numCities)
-                    {
-                        particle.position[i] = numCities - 1;
-                    }
-                    else if (particle.position[i] < 0)
-                    {
-                        particle.position[i] = 0;
-                    }
+                    particle.Position[i] += (int)particle.Velocity[i];
+                    if (particle.Position[i] < 0)
+                        particle.Position[i] = 0;
+                    if (particle.Position[i] >= numCities)
+                        particle.Position[i] = numCities - 1;
                 }
-
             }
         }
     }
-
-    private void Start()
+    public Tuple<string,int,List<int>,double> Solver(int[,] distanceMatrix)
     {
-        distanceMatrix = DistanceMatrix(num_cities);
+        //distanceMatrix = DistanceMatrix(num_cities);
 
-        print("Distance Matrix");
-        for (int i = 0; i < num_cities; i++)
+        /*Debug.Log("Distance Matrix");
+        for (int i = 0; i < GetNumCities(); i++)
         {
             string row = "";
-            for (int j = 0; j < num_cities; j++)
+            for (int j = 0; j < GetNumCities(); j++)
             {
                 row += distanceMatrix[i, j] + " ";
             }
-            print(row);
-        }
+            Debug.Log(row);
+        }*/
 
-        Swarm swarm = new Swarm(num_particles, num_cities);
+        var time = System.DateTime.Now;
 
-        for(int i = 0; i < num_particles;i++)
-        {
-            swarm.particles.Add(new Particle(num_cities));
-        }
+        Swarm swarm = new Swarm(numParticles, numCities);
 
-        for (int i = 0; i < num_iterations; i++)
+        for (int i = 0; i < numIterations; i++)
         {
             swarm.Evaluate(distanceMatrix);
-            swarm.Update(w, c1, c2, max_velocity);
+            swarm.Update(w, c1, c2, maxVelocity,numCities);
         }
 
-        Debug.Log("Best distance: " + swarm.gBest);
-        string bestPath = "";
-        foreach (int city in swarm.gBestPosition)
-        {
-            bestPath += city + " ";
-        }
-        Debug.Log("Best path: " + bestPath);
+        //Debug.Log("The minimum distance is: " + swarm.GBestValue);
+        //Debug.Log("The best route is: " + string.Join(" -> ", swarm.GBestPosition));
 
+        var time2 = System.DateTime.Now;
+
+        var timeElapsed = (time2 - time).TotalMilliseconds;
+
+        return Tuple.Create("PSO",(int)swarm.GBestValue, swarm.GBestPosition.ToList(),timeElapsed);
     }
 
 }
