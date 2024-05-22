@@ -351,6 +351,24 @@ namespace SpaceOptimization
             
             //Calculate the distance matrix
             int[,] distanceMatrix = graph.GraphToDistanceMatrix();
+
+            //Save the distance matrix to a file to be used in the TSP
+            var copyMatrix = new string[distanceMatrix.GetLength(0), distanceMatrix.GetLength(1)];
+
+            for (int j = 0; j < distanceMatrix.GetLength(0); j++)
+            {
+                for (int k = 0; k < distanceMatrix.GetLength(1); k++)
+                {
+                    copyMatrix[j, k] = distanceMatrix[j, k].ToString();
+                }
+            }
+
+            string mdfilename = "TSP_DATA_" + distanceMatrix.GetLength(0) + "x" + distanceMatrix.GetLength(1) + "_" +
+                    DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+            WriteMatrixToFile(copyMatrix, Application.dataPath + "/SpaceOptimization/Experiments/"+ 
+                matrix.GetLength(0)+"x"+matrix.GetLength(1)+"/"+mdfilename+".txt");
+
+
             //Create a list of solvers data
             List<Tuple<string,int, List<int>,double>> solversData = new List<Tuple<string,int, List<int>,double>>();
 
@@ -362,7 +380,7 @@ namespace SpaceOptimization
             //experiment with the solvers
             int iterations = 100;
 
-            for(int i = 0; i < iterations; i++)
+            for (int i = 0; i < iterations; i++)
             {
                 //Get the solvers data
                 var acoSolver = aco_TSP.Solver(distanceMatrix);
@@ -373,7 +391,8 @@ namespace SpaceOptimization
                 solversData.Add(acoSolver);
                 solversData.Add(saSolver);
                 solversData.Add(psoSolver);
-                SaveTSPData(distanceMatrix, solversData,1, "TSP_DATA_"+matrix.GetLength(0)+"x"+matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
+
+                SaveTSPData(mdfilename, solversData,1, "TSP_DATA_"+matrix.GetLength(0)+"x"+matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
                 solversData.Clear();
             }
             //Get the solvers data
@@ -390,7 +409,7 @@ namespace SpaceOptimization
             Debug.Log("Saved Data");
         }
 
-        void SaveTSPData(int[,]distanceMatrix,List<Tuple<string,int,List<int>,double>> data,int interations,string filename = "TSP_Data")
+        void SaveTSPData(string dmfilename,List<Tuple<string,int,List<int>,double>> data,int interations,string filename = "TSP_Data")
         {
             //Save the rooms data to a file
             string path = Application.dataPath + "/SpaceOptimization/Resources/Maps/" + filename + ".csv";
@@ -407,7 +426,7 @@ namespace SpaceOptimization
                 //check if first line is empty, if so, write the header
                 if (new FileInfo(path).Length == 0)
                 {
-                    string header = "Matrix Width;Matrix Height;Distance Matrix;";
+                    string header = "dmfilename;";
 
                     foreach (var item in data)
                     {
@@ -423,27 +442,8 @@ namespace SpaceOptimization
                     }
                     writer.WriteLine(header);
                 }
-                
-                string matrixWidth = distanceMatrix.GetLength(0).ToString();
-                string matrixHeight = distanceMatrix.GetLength(1).ToString();
-                string matrixAsString = "";
-                for (int i = 0; i < distanceMatrix.GetLength(0); i++)
-                {
-                    for (int j = 0; j < distanceMatrix.GetLength(1); j++)
-                    {
-                        //if it is the last element, don't add the separator
-                        if (i == distanceMatrix.GetLength(0) - 1 && j == distanceMatrix.GetLength(1) - 1)
-                        {
-                            matrixAsString += distanceMatrix[i, j];
-                        }
-                        else
-                        {
-                            matrixAsString += distanceMatrix[i, j] + ",";
-                        }
-                    }
-                }
 
-                var line = matrixWidth + ";" + matrixHeight + ";" + matrixAsString + ";";
+                var line = dmfilename + ";";
 
                 foreach (var item in data)
                 {

@@ -370,7 +370,7 @@ namespace SpaceOptimization.BSP
                         //if (matrix[i,j-1] == 2 && matrix[i,j+2] == 2)
                         if (leftCell == 2 && twoLeftCell == 2)
                         {
-                            Debug.Log("Horizontal Door");
+                            //Debug.Log("Horizontal Door");
                             //valid door
                             matrix[i, j] = 3;
                             matrix[i, j + 1] = 3;
@@ -400,7 +400,7 @@ namespace SpaceOptimization.BSP
                         //check if the cell in the up is a floor and the cell in the down is a wall
                         if (upCell == 2 && DownCell2 == 2)
                         {
-                            Debug.Log("Vertical Door");
+                            //Debug.Log("Vertical Door");
                             //valid door
                             matrix[i, j] = 3;
                             matrix[i + 1, j] = 3;

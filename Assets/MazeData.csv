@@ -536,3 +536,7 @@ Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;
 True;SinglePoint;RandomResetting;Roulette;681;329;396;74,28571
 Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
 True;SinglePoint;RandomResetting;Roulette;61;949;82;80
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;SinglePoint;RandomResetting;Roulette;682;328;402;73,33334
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;SinglePoint;RandomResetting;Roulette;676;334;337;75,2381
