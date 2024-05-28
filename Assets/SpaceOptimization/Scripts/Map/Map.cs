@@ -200,16 +200,16 @@ namespace SpaceOptimization{
         public void TSP()
         {
             //if matrix is empty, load the example matrix
-            /*if (matrix == null)
+            if (matrix == null)
             {
                 filename = "ExampleMap";
                 matrix = mapCreator.Creator(filename);
                 mapCreator.SetNeighbors(matrix);
                 width = matrix.GetLength(0);
                 height = matrix.GetLength(1);
-            }*/
+            }
 
-            var iterations = 1;
+            /*var iterations = 1;
             var panel = canvasController.panels.Find(p => p.name == "PanelStep3") as TSPPanel;
             var panelConfiguration = panel.GetPanelData();
             for (int i = 0; i < iterations; i++)
@@ -217,15 +217,13 @@ namespace SpaceOptimization{
                 BuildMap("BSP_Maze");
                 //search for panel with the name TSPPanel and convert it to TSPPanel
                 roomRecognition.TSP(matrix);
-            }
+            }*/
 
-            /*
+            
             //search for panel with the name TSPPanel and convert it to TSPPanel
             var panel = canvasController.panels.Find(p => p.name == "PanelStep3") as TSPPanel;
             var panelConfiguration = panel.GetPanelData();
-
             roomRecognition.TSP(matrix);
-            */
         }
 
 

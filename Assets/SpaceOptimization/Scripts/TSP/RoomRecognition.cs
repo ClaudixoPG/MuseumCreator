@@ -230,6 +230,17 @@ namespace SpaceOptimization
                 //rooms[matrix[xPosition, yPosition]].nodes.Find(node => node.Position == new Vector2Int(xPosition, yPosition)).Occupied = true;
             }
 
+            //DEBUG
+            for (int i = 0; i < rows; i++)
+            {
+                string row = "";
+                for (int j = 0; j < cols; j++)
+                {
+                    row += newMatrix[i, j] + " ";
+                }
+                Debug.Log(row);
+            }
+
             //Save the new matrix to a file
 
             string filename = "RoomRecognition";
@@ -298,9 +309,13 @@ namespace SpaceOptimization
             foreach(var room in rooms)
             {
                 List<Node> doorsInRoom = new List<Node>();
+                List<Node> OccupiedNodes = new List<Node>();
+
+                //print values of the room
 
                 foreach (var node in room.Value.nodes)
                 {
+
                     //Get lateral nodes of the current node
                     Node leftNode = new Node(new Vector2Int(node.Position.x, node.Position.y - 1));
                     Node rightNode = new Node(new Vector2Int(node.Position.x, node.Position.y + 1));
@@ -324,6 +339,10 @@ namespace SpaceOptimization
                     {
                         doorsInRoom.Add(bottomNode);
                     }
+                    if(node.Occupied)
+                    {
+                        OccupiedNodes.Add(node);
+                    }
                 }
 
                 //Draw the lines between the doors
@@ -339,7 +358,26 @@ namespace SpaceOptimization
                             continue;
                         }
 
+                        //add first city at beginning of the matrix and the last city at the end of the matrix
+                        OccupiedNodes.Insert(0, new Node(new Vector2Int(city1.x, city1.y)));
+                        OccupiedNodes.Add(new Node(new Vector2Int(city2.x, city2.y)));
+
+                        var dMatrix = new int[OccupiedNodes.Count, OccupiedNodes.Count];
+
+                        for (int k = 0; k < OccupiedNodes.Count; k++)
+                        {
+                            for (int l = 0; l < OccupiedNodes.Count; l++)
+                            {
+                                dMatrix[k, l] = Mathf.Abs(OccupiedNodes[k].Position.x - OccupiedNodes[l].Position.x) + Mathf.Abs(OccupiedNodes[k].Position.y - OccupiedNodes[l].Position.y);
+                                Debug.DrawLine(new Vector3(OccupiedNodes[k].Position.x, 0, OccupiedNodes[k].Position.y) * scale,
+                                new Vector3(OccupiedNodes[l].Position.x, 0, OccupiedNodes[l].Position.y) * scale, Color.red, 1000f);
+                            }
+                        }
+
+
+                        //Change distance for Held-Karp algorithm
                         var distance = Mathf.Abs(city1.x - city2.x) + Mathf.Abs(city1.y - city2.y);
+                        
                         Debug.DrawLine(new Vector3(city1.x, 0, city1.y) * scale, 
                             new Vector3(city2.x, 0, city2.y) * scale, Color.yellow, 1000f);
                         graph.edges.Add(new Edge { StartCity = city1, EndCity = city2, weight = distance });
