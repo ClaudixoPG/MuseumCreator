@@ -90,11 +90,11 @@ namespace SpaceOptimization
                     //Draw a line if 2 doors are connected
                     if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
                     {
-                        //Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i, 0, j + 1) * scale, Color.yellow, 1000f);
+                        Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i, 0, j + 1) * scale, Color.yellow, 1000f);
                     }
                     if (matrix[i, j] == -1 && matrix[i + 1, j] == -1)
                     {
-                        //Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i + 1, 0, j) * scale, Color.yellow, 1000f);
+                        Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i + 1, 0, j) * scale, Color.yellow, 1000f);
                     }
 
                     if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
@@ -181,9 +181,9 @@ namespace SpaceOptimization
                     Vector2 connectedRoomMiddlePoint = new Vector2((connectedInitX + connectedEndX) / 2, (connectedInitY + connectedEndY) / 2);
 
                     //Draw a line between the middle points of the rooms
-                    Debug.DrawLine(new Vector3(roomMiddlePoint.x, 0, roomMiddlePoint.y) * scale, 
+                    /*Debug.DrawLine(new Vector3(roomMiddlePoint.x, 0, roomMiddlePoint.y) * scale, 
                         new Vector3(connectedRoomMiddlePoint.x, 0, connectedRoomMiddlePoint.y) * scale, 
-                        Color.green, 1000f);
+                        Color.green, 1000f);*/
 
                 }
             }
@@ -588,6 +588,8 @@ namespace SpaceOptimization
         }
 
     }
+
+
 }
 
 

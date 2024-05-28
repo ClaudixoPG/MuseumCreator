@@ -2,6 +2,7 @@
 import numpy as np
 import scipy.stats as stats
 import pandas as pd
+import os
 
 def friedman_test(data):
     """
@@ -58,8 +59,42 @@ def nemenyi(data):
     
     return df
 
-# Example
-data = [np.array([1, 2, 3]), np.array([2, 3, 1]), np.array([3, 1, 2])]
+def load_csv_as_strings(file_path):
+    """
+    This function reads a CSV file and treats each cell as a string, preserving internal commas.
+    """
+    try:
+        # Read the CSV file without any delimiter enforcement
+        data = pd.read_csv(file_path, sep=None, engine='python', dtype=str)
+        return data
+    except Exception as e:
+        print(f"Error loading data from {file_path}: {e}")
+        return None
+
+# Example usage
+file_path = 'C:/Users/claud/Documents/GitHub/Prototypes/MuseumOptimization/MuseumCreator/Assets/SpaceOptimization/Resources/Maps/TSP_DATA_11x11.csv'
+data = load_csv_as_strings(file_path)
+
+if data is not None:
+    print("Data loaded successfully.")
+    print(data.head())  # Display the first few rows of the dataframe
+else:
+    print("Failed to load data.")
+
+#print values in columns  ACOTourLength	ACOTour SATourLength	SATour	PSOTourLength	PSOTour	
+
+df = data[['ACOTourLength', 'SATourLength', 'PSOTourLength']]
+
+#convert columns to  list of numpy arrays for the friedman test
+data = [df[col].values.astype(float) for col in df.columns]
+
+#print the data values
+for i in range(len(data)):
+    print(f'Group {i + 1}: {data[i]}')
+
+# Example usage
+
+#perform the friedman test
 stat, p = friedman_test(data)
 print('Friedman test statistic:', stat)
 print('P-value:', p)

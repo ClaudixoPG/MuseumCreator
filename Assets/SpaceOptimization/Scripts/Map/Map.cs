@@ -209,7 +209,7 @@ namespace SpaceOptimization{
                 height = matrix.GetLength(1);
             }*/
 
-            var iterations = 100;
+            var iterations = 1;
             var panel = canvasController.panels.Find(p => p.name == "PanelStep3") as TSPPanel;
             var panelConfiguration = panel.GetPanelData();
             for (int i = 0; i < iterations; i++)
