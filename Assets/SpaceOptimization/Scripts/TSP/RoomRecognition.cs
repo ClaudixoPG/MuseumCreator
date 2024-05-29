@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace SpaceOptimization
@@ -90,11 +91,11 @@ namespace SpaceOptimization
                     //Draw a line if 2 doors are connected
                     if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
                     {
-                        Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i, 0, j + 1) * scale, Color.yellow, 1000f);
+                        Debug.DrawLine(new Vector3(i, 1, j) * scale, new Vector3(i, 1, j + 1) * scale, Color.yellow, 1000f);
                     }
                     if (matrix[i, j] == -1 && matrix[i + 1, j] == -1)
                     {
-                        Debug.DrawLine(new Vector3(i, 0, j) * scale, new Vector3(i + 1, 0, j) * scale, Color.yellow, 1000f);
+                        Debug.DrawLine(new Vector3(i, 1, j) * scale, new Vector3(i + 1, 1, j) * scale, Color.yellow, 1000f);
                     }
 
                     if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
@@ -231,7 +232,7 @@ namespace SpaceOptimization
             }
 
             //DEBUG
-            for (int i = 0; i < rows; i++)
+            /*for (int i = 0; i < rows; i++)
             {
                 string row = "";
                 for (int j = 0; j < cols; j++)
@@ -239,7 +240,7 @@ namespace SpaceOptimization
                     row += newMatrix[i, j] + " ";
                 }
                 Debug.Log(row);
-            }
+            }*/
 
             //Save the new matrix to a file
 
@@ -353,14 +354,29 @@ namespace SpaceOptimization
                         var city1 = graph.cities.Find(city => city.x == doorsInRoom[i].Position.x && city.y == doorsInRoom[i].Position.y);
                         var city2 = graph.cities.Find(city => city.x == doorsInRoom[j].Position.x && city.y == doorsInRoom[j].Position.y);
 
-                        if (city1 == null || city2 == null)
+                        if (city1 == null || city2 == null || city1.Equals(city2))
                         {
                             continue;
                         }
 
                         //add first city at beginning of the matrix and the last city at the end of the matrix
-                        OccupiedNodes.Insert(0, new Node(new Vector2Int(city1.x, city1.y)));
-                        OccupiedNodes.Add(new Node(new Vector2Int(city2.x, city2.y)));
+
+                        //check if the nodes are already added to the graph, using find method to check if the city is already in the list
+                        var firstValue = new Node(new Vector2Int(city1.x, city1.y));
+                        var lastValue = new Node(new Vector2Int(city2.x, city2.y));
+
+                        //Check if firstValue is already in the list of occupied nodes
+                        if (!OccupiedNodes.Exists(node => node.Position == firstValue.Position))
+                        {
+                            OccupiedNodes.Insert(0, firstValue);
+                        }
+                        if(!OccupiedNodes.Exists(node => node.Position == lastValue.Position))
+                        {
+                            OccupiedNodes.Add(lastValue);
+                        }
+
+                        //OccupiedNodes.Insert(0, new Node(new Vector2Int(city1.x, city1.y)));
+                        //OccupiedNodes.Add(new Node(new Vector2Int(city2.x, city2.y)));
 
                         var dMatrix = new int[OccupiedNodes.Count, OccupiedNodes.Count];
 
@@ -370,23 +386,50 @@ namespace SpaceOptimization
                             {
                                 dMatrix[k, l] = Mathf.Abs(OccupiedNodes[k].Position.x - OccupiedNodes[l].Position.x) + Mathf.Abs(OccupiedNodes[k].Position.y - OccupiedNodes[l].Position.y);
                                 Debug.DrawLine(new Vector3(OccupiedNodes[k].Position.x, 0, OccupiedNodes[k].Position.y) * scale,
-                                new Vector3(OccupiedNodes[l].Position.x, 0, OccupiedNodes[l].Position.y) * scale, Color.red, 1000f);
+                                new Vector3(OccupiedNodes[l].Position.x, 0, OccupiedNodes[l].Position.y) * scale, Color.white, 2f);
                             }
                         }
 
+                        //Calculate distance using the Held-Karp algorithm
+                        var artworksPath = HeldKarp.CalculateValue(dMatrix);
 
-                        //Change distance for Held-Karp algorithm
-                        var distance = Mathf.Abs(city1.x - city2.x) + Mathf.Abs(city1.y - city2.y);
-                        
-                        Debug.DrawLine(new Vector3(city1.x, 0, city1.y) * scale, 
-                            new Vector3(city2.x, 0, city2.y) * scale, Color.yellow, 1000f);
-                        graph.edges.Add(new Edge { StartCity = city1, EndCity = city2, weight = distance });
+                        //draw the line of each connection returned by the algorithm (Held-Karp)
+                        /*for (int k = 0;k < artworksPath.Item2.Count - 1; k++)
+                        {
+                            //Draw first line as green
+                            if (k == 0)
+                            {
+                                Debug.DrawLine(new Vector3(OccupiedNodes[artworksPath.Item2[k]].Position.x, 1, OccupiedNodes[artworksPath.Item2[k]].Position.y) * scale,
+                                new Vector3(OccupiedNodes[artworksPath.Item2[k + 1]].Position.x, 1, OccupiedNodes[artworksPath.Item2[k + 1]].Position.y) * scale, Color.green, 1000f);
+                            }
+                            //Draw the last line as red
+                            else if (k == artworksPath.Item2.Count - 2)
+                            {
+                                Debug.DrawLine(new Vector3(OccupiedNodes[artworksPath.Item2[k]].Position.x, 1, OccupiedNodes[artworksPath.Item2[k]].Position.y) * scale,
+                                new Vector3(OccupiedNodes[artworksPath.Item2[k + 1]].Position.x, 1, OccupiedNodes[artworksPath.Item2[k + 1]].Position.y) * scale, Color.red, 1000f);
+                            }
+                            //Draw all the other lines as yellow
+                            else
+                            {
+                                Debug.DrawLine(new Vector3(OccupiedNodes[artworksPath.Item2[k]].Position.x, 1, OccupiedNodes[artworksPath.Item2[k]].Position.y) * scale,
+                                new Vector3(OccupiedNodes[artworksPath.Item2[k + 1]].Position.x, 1, OccupiedNodes[artworksPath.Item2[k + 1]].Position.y) * scale, Color.yellow, 1000f);
+                            }
+                           
+                            //Debug.DrawLine(new Vector3(OccupiedNodes[distance.Item2[k]].Position.x, 0, OccupiedNodes[distance.Item2[k]].Position.y) * scale,
+                            //new Vector3(OccupiedNodes[distance.Item2[k + 1]].Position.x, 0, OccupiedNodes[distance.Item2[k + 1]].Position.y) * scale, Color.yellow, 1000f);
+                        }*/
+
+                        graph.edges.Add(new Edge { StartCity = city1, EndCity = city2, Artworks = OccupiedNodes, weight = artworksPath.Item1, path = artworksPath.Item2 });
                     }
                 }
-
-                
             }
+
+            SolveTSP(graph);
             
+        }
+
+        void SolveTSP(Graph graph)
+        {
             //Calculate the distance matrix
             int[,] distanceMatrix = graph.GraphToDistanceMatrix();
 
@@ -403,50 +446,76 @@ namespace SpaceOptimization
 
             string mdfilename = "TSP_DATA_" + distanceMatrix.GetLength(0) + "x" + distanceMatrix.GetLength(1) + "_" +
                     DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
-            WriteMatrixToFile(copyMatrix, Application.dataPath + "/SpaceOptimization/Experiments/"+ 
-                matrix.GetLength(0)+"x"+matrix.GetLength(1)+"/"+mdfilename+".txt");
+            WriteMatrixToFile(copyMatrix, Application.dataPath + "/SpaceOptimization/Experiments/" +
+                matrix.GetLength(0) + "x" + matrix.GetLength(1) + "/" + mdfilename + ".txt");
 
 
             //Create a list of solvers data
-            List<Tuple<string,int, List<int>,double>> solversData = new List<Tuple<string,int, List<int>,double>>();
+            List<Tuple<string, int, List<int>, double>> solversData = new List<Tuple<string, int, List<int>, double>>();
 
             //Initialize the solvers
-            ACO_TSP aco_TSP = new ACO_TSP(graph.cities.Count/2, 10, 1.0f, 2.0f);
-            SA_TSP sa_TSP = new SA_TSP(graph.cities.Count/2, 1000, 1.0f, 0.001f);
-            PSO_TSP pSO_TSP = new PSO_TSP(graph.cities.Count/2,10,100,0.5f,0.7f,1.5f,1.5f);
+            ACO_TSP aco_TSP = new ACO_TSP(graph.cities.Count / 2, 10, 1.0f, 2.0f);
+            SA_TSP sa_TSP = new SA_TSP(graph.cities.Count / 2, 1000, 1.0f, 0.001f);
+            PSO_TSP pSO_TSP = new PSO_TSP(graph.cities.Count / 2, 10, 100, 0.5f, 0.7f, 1.5f, 1.5f);
 
             //experiment with the solvers
-            int iterations = 100;
+            int iterations = 1;
 
             for (int i = 0; i < iterations; i++)
             {
                 //Get the solvers data
                 var acoSolver = aco_TSP.Solver(distanceMatrix);
-                var saSolver = sa_TSP.Solver(distanceMatrix);
-                var psoSolver = pSO_TSP.Solver(distanceMatrix);
+                //var saSolver = sa_TSP.Solver(distanceMatrix);
+                //var psoSolver = pSO_TSP.Solver(distanceMatrix);
 
                 //Add the solvers data to the list
                 solversData.Add(acoSolver);
-                solversData.Add(saSolver);
-                solversData.Add(psoSolver);
+                //solversData.Add(saSolver);
+                //solversData.Add(psoSolver);
+                PrintDebugLinesInEditor(graph, acoSolver);
 
-                SaveTSPData(mdfilename, solversData,1, "TSP_DATA_"+matrix.GetLength(0)+"x"+matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
+                SaveTSPData(mdfilename, solversData, 1, "TSP_DATA_" + matrix.GetLength(0) + "x" + matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
                 solversData.Clear();
             }
-            //Get the solvers data
-            /*var acoSolver = aco_TSP.Solver(distanceMatrix);
-            var saSolver = sa_TSP.Solver(distanceMatrix);
-            var psoSolver = pSO_TSP.Solver(distanceMatrix);
-            
-            //Add the solvers data to the list
-            solversData.Add(acoSolver);
-            solversData.Add(saSolver);
-            solversData.Add(psoSolver);*/
-            //Save the data to a file
-            //SaveTSPData(distanceMatrix,solversData, 1,1,"TSP_DATA_20x20"); //aco_TSP.executionTime, aco_TSP.iterations);
             Debug.Log("Saved Data");
         }
+        
+        void PrintDebugLinesInEditor(Graph graph,Tuple<string,int,List<int>,double> data)
+        {
+            for(int i = 0; i < data.Item3.Count - 1; i++)
+            {
+                //Find the city in the graph
+                var city1 = graph.cities.Find(city => city.id == data.Item3[i]);
+                var city2 = graph.cities.Find(city => city.id == data.Item3[i + 1]);
 
+                //Find the edge that connects the cities in the graph
+                var edge = graph.edges.Find(e => e.StartCity.id == city1.id && e.EndCity.id == city2.id);
+
+                //Draw a line between each artwork in the path of the edge
+                for (int j = 0; j < edge.Artworks.Count - 1; j++)
+                {
+                    Debug.DrawLine(new Vector3(edge.Artworks[j].Position.x, 1, edge.Artworks[j].Position.y) * scale,
+                    new Vector3(edge.Artworks[j + 1].Position.x, 1, edge.Artworks[j + 1].Position.y) * scale, Color.yellow, 1000f);
+                }
+            }
+
+            //Draw the las connection between the last and the first city
+            var lastCity = graph.cities.Find(city => city.id == data.Item3[data.Item3.Count - 1]);
+            var firstCity = graph.cities.Find(city => city.id == data.Item3[0]);
+
+            var lastEdge = graph.edges.Find(e => e.StartCity.id == lastCity.id && e.EndCity.id == firstCity.id);
+
+            for (int j = 0; j < lastEdge.Artworks.Count - 1; j++)
+            {
+                Debug.DrawLine(new Vector3(lastEdge.Artworks[j].Position.x, 1, lastEdge.Artworks[j].Position.y) * scale,
+                new Vector3(lastEdge.Artworks[j + 1].Position.x, 1, lastEdge.Artworks[j + 1].Position.y) * scale, Color.yellow, 1000f);
+            }
+
+            /*foreach (var edge in graph.edges)
+            {
+                Debug.DrawLine
+            }*/
+        }   
         void SaveTSPData(string dmfilename,List<Tuple<string,int,List<int>,double>> data,int interations,string filename = "TSP_Data")
         {
             //Save the rooms data to a file
@@ -557,20 +626,6 @@ namespace SpaceOptimization
 
             }
 
-            public void PrintGraph()
-            {
-                /*foreach (var city in cities)
-                {
-                    Debug.Log("City: " + city.id + " x: " + city.x + " y: " + city.y);
-                }*/
-
-                foreach (var edge in edges)
-                {
-                    Debug.Log("City: " + edge.StartCity.id + "is connected with" + edge.EndCity.id + " and their distance are" + edge.weight);
-                    //Debug.Log("Edge: " + edge.StartCity.id + " " + edge.EndCity.id + " " + edge.weight);
-                }
-            }
-
             public int[,] GraphToDistanceMatrix()
             { 
                 var n = cities.Count/2;
@@ -606,7 +661,9 @@ namespace SpaceOptimization
         {
             public City StartCity;
             public City EndCity;
+            public List<Node> Artworks = new List<Node>();
             public int weight;
+            public List<int> path;
         }
         
         
