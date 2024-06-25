@@ -662,3 +662,15 @@ Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;
 True;SinglePoint;RandomResetting;Roulette;718;292;796;78,14207
 Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
 True;SinglePoint;RandomResetting;Roulette;813;197;1176;76,2431
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;SinglePoint;RandomResetting;Roulette;715;295;1322;75,13228
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;SinglePoint;RandomResetting;Roulette;693;317;2742;75,75758
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;TwoPoint;Scramble;Tournament;672;143;1325;60,20942
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;TwoPoint;Swap;Rank;76;934;142;79,55801
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;SinglePoint;RandomResetting;Roulette;666;344;2537;77,32919
+Have Elitism;Crossover;Mutation;Selection;Valid Chromosomes;Invalid Chromosomes;Time;Best Fitness
+True;SinglePoint;RandomResetting;Roulette;657;353;2986;76,85185

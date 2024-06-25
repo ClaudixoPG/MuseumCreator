@@ -91,11 +91,11 @@ namespace SpaceOptimization
                     //Draw a line if 2 doors are connected
                     if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
                     {
-                        Debug.DrawLine(new Vector3(i, 1, j) * scale, new Vector3(i, 1, j + 1) * scale, Color.yellow, 1000f);
+                        //Debug.DrawLine(new Vector3(i, 1, j) * scale, new Vector3(i, 1, j + 1) * scale, Color.yellow, 1000f);
                     }
                     if (matrix[i, j] == -1 && matrix[i + 1, j] == -1)
                     {
-                        Debug.DrawLine(new Vector3(i, 1, j) * scale, new Vector3(i + 1, 1, j) * scale, Color.yellow, 1000f);
+                        //Debug.DrawLine(new Vector3(i, 1, j) * scale, new Vector3(i + 1, 1, j) * scale, Color.yellow, 1000f);
                     }
 
                     if (matrix[i, j] == -1 && matrix[i, j + 1] == -1)
@@ -385,8 +385,8 @@ namespace SpaceOptimization
                             for (int l = 0; l < OccupiedNodes.Count; l++)
                             {
                                 dMatrix[k, l] = Mathf.Abs(OccupiedNodes[k].Position.x - OccupiedNodes[l].Position.x) + Mathf.Abs(OccupiedNodes[k].Position.y - OccupiedNodes[l].Position.y);
-                                Debug.DrawLine(new Vector3(OccupiedNodes[k].Position.x, 0, OccupiedNodes[k].Position.y) * scale,
-                                new Vector3(OccupiedNodes[l].Position.x, 0, OccupiedNodes[l].Position.y) * scale, Color.white, 2f);
+                                //Debug.DrawLine(new Vector3(OccupiedNodes[k].Position.x, 0, OccupiedNodes[k].Position.y) * scale,
+                                //new Vector3(OccupiedNodes[l].Position.x, 0, OccupiedNodes[l].Position.y) * scale, Color.white, 2f);
                             }
                         }
 
@@ -456,27 +456,27 @@ namespace SpaceOptimization
             //Initialize the solvers
             ACO_TSP aco_TSP = new ACO_TSP(graph.cities.Count / 2, 10, 1.0f, 2.0f);
             SA_TSP sa_TSP = new SA_TSP(graph.cities.Count / 2, 1000, 1.0f, 0.001f);
-            PSO_TSP pSO_TSP = new PSO_TSP(graph.cities.Count / 2, 10, 100, 0.5f, 0.7f, 1.5f, 1.5f);
-            GA_TSP gA_TSP = new GA_TSP(graph.cities.Count / 2, 100, 0.1f, 100);
+            PSO_TSP pSO_TSP = new PSO_TSP(graph.cities.Count / 2, 10, 1000, 0.5f, 0.7f, 1.5f, 1.5f);
+            GA_TSP gA_TSP = new GA_TSP(graph.cities.Count / 2, 10, 0.1f, 1000);
             //experiment with the solvers
-            int iterations = 1;
+            int iterations = 100;
 
             for (int i = 0; i < iterations; i++)
             {
                 //Get the solvers data
                 var acoSolver = aco_TSP.Solver(distanceMatrix);
-                //var saSolver = sa_TSP.Solver(distanceMatrix);
-                //var psoSolver = pSO_TSP.Solver(distanceMatrix);
-                //var gaSolver = gA_TSP.Solver(distanceMatrix);
+                var saSolver = sa_TSP.Solver(distanceMatrix);
+                var psoSolver = pSO_TSP.Solver(distanceMatrix);
+                var gaSolver = gA_TSP.Solver(distanceMatrix);
 
                 //Add the solvers data to the list
                 solversData.Add(acoSolver);
-                //solversData.Add(saSolver);
-                //solversData.Add(psoSolver);
-                //solversData.Add(gaSolver);
-                PrintDebugLinesInEditor(graph, acoSolver);
+                solversData.Add(saSolver);
+                solversData.Add(psoSolver);
+                solversData.Add(gaSolver);
+                //PrintDebugLinesInEditor(graph, acoSolver);
                 //PrintDebugLinesInEditor(graph, gaSolver);
-                //SaveTSPData(mdfilename, solversData, 1, "TSP_DATA_" + matrix.GetLength(0) + "x" + matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
+                SaveTSPData(mdfilename, solversData, 1, "TSP_DATA_" + matrix.GetLength(0) + "x" + matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
                 solversData.Clear();
             }
             Debug.Log("Saved Data");

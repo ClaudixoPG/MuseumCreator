@@ -42,7 +42,8 @@ public class GA_TSP
         int bestFitness = int.MaxValue;
         int[] bestIndividual = new int[n];
 
-        double timeStart = Time.realtimeSinceStartup;
+        //double timeStart = Time.realtimeSinceStartup;
+        var time = System.DateTime.Now;
 
         for (int i = 0; i < maxGeneration; i++)
         {
@@ -62,13 +63,17 @@ public class GA_TSP
             }
         }
 
-        double timeEnd = Time.realtimeSinceStartup;
+        var time2 = System.DateTime.Now;
 
-        Debug.Log("The best individual is: " + string.Join(",", bestIndividual));
-        Debug.Log("The fitness of the best individual is: " + bestFitness);
-        Debug.Log("The time cost is: " + (timeEnd - timeStart));
+        //double timeEnd = Time.realtimeSinceStartup;
 
-        return Tuple.Create("GA", bestFitness, bestIndividual.ToList(), timeEnd - timeStart);
+        //Debug.Log("The best individual is: " + string.Join(",", bestIndividual));
+        //Debug.Log("The fitness of the best individual is: " + bestFitness);
+        //Debug.Log("The time cost is: " + (timeEnd - timeStart));
+
+        var timeElapsed = (time2 - time).TotalMilliseconds;
+
+        return Tuple.Create("GA", bestFitness, bestIndividual.ToList(), timeElapsed);
 
     }
 
