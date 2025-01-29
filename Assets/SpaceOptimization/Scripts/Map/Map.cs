@@ -46,6 +46,8 @@ namespace SpaceOptimization{
         private Genetic.MutationType mutationType;
         private Genetic.SelectionType selectionType;
 
+        private bool alreadyGenerated = false;
+
         //save data
         private List<Data> data = new List<Data>();
 
@@ -54,7 +56,37 @@ namespace SpaceOptimization{
             closedNodes = mapCreator.GetClosedNodes();
         }
 
-        private bool alreadyGenerated = false;
+        //function to remove all elements from the map
+        public void RestartToInitialStage()
+        {
+            //Seek map containers and remove all children objects of them
+            GameObject wallsContainer = GameObject.Find("WallsContainer");
+            GameObject floorsContainer = GameObject.Find("FloorsContainer");
+            GameObject nonTraversableContainer = GameObject.Find("NonTraversableContainer");
+            GameObject doorsContainer = GameObject.Find("DoorsContainer");
+
+            foreach (Transform child in wallsContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in floorsContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in nonTraversableContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in doorsContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            RestartMatrix();
+        }
+
 
         public void PopulateMap() {
 
@@ -186,6 +218,11 @@ namespace SpaceOptimization{
             bspMazeGeneration.CreateMaze(w,h,min,filename);
 
             matrix = bspMazeGeneration.GetMatrix();
+
+            //patch to fix the bug of the BSP algorithm
+            mapCreator.openNodes.Clear();
+            mapCreator.closedNodes.Clear();
+
             mapCreator.SetNeighbors(matrix);
             this.width = matrix.GetLength(0);
             this.height = matrix.GetLength(1);

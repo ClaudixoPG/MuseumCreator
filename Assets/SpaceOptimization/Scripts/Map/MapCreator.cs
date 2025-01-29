@@ -9,8 +9,8 @@ namespace SpaceOptimization{
         public GameObject[] prefabs;
         public GameObject[] containers;
         public int scale; //scale of each node
-        private List<GameObject> openNodes = new List<GameObject>();
-        private List<GameObject> closedNodes = new List<GameObject>();
+        public List<GameObject> openNodes = new List<GameObject>();
+        public List<GameObject> closedNodes = new List<GameObject>();
 
 
         //read a matrix from a text file and return it as a matrix of integers, considering the first line as the number of lines and columns
