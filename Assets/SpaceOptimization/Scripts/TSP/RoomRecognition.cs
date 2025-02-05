@@ -455,26 +455,27 @@ namespace SpaceOptimization
 
             //Initialize the solvers
             ACO_TSP aco_TSP = new ACO_TSP(graph.cities.Count / 2, 10, 1.0f, 2.0f);
-            SA_TSP sa_TSP = new SA_TSP(graph.cities.Count / 2, 1000, 1.0f, 0.001f);
-            PSO_TSP pSO_TSP = new PSO_TSP(graph.cities.Count / 2, 10, 1000, 0.5f, 0.7f, 1.5f, 1.5f);
-            GA_TSP gA_TSP = new GA_TSP(graph.cities.Count / 2, 10, 0.1f, 1000);
+            //SA_TSP sa_TSP = new SA_TSP(graph.cities.Count / 2, 1000, 1.0f, 0.001f);
+            //PSO_TSP pSO_TSP = new PSO_TSP(graph.cities.Count / 2, 10, 1000, 0.5f, 0.7f, 1.5f, 1.5f);
+            //GA_TSP gA_TSP = new GA_TSP(graph.cities.Count / 2, 10, 0.1f, 1000);
             //experiment with the solvers
-            int iterations = 100;
+            //int iterations = 100;
+            int iterations = 1;
 
             for (int i = 0; i < iterations; i++)
             {
                 //Get the solvers data
                 var acoSolver = aco_TSP.Solver(distanceMatrix);
-                var saSolver = sa_TSP.Solver(distanceMatrix);
-                var psoSolver = pSO_TSP.Solver(distanceMatrix);
-                var gaSolver = gA_TSP.Solver(distanceMatrix);
+                //var saSolver = sa_TSP.Solver(distanceMatrix);
+                //var psoSolver = pSO_TSP.Solver(distanceMatrix);
+                //var gaSolver = gA_TSP.Solver(distanceMatrix);
 
                 //Add the solvers data to the list
                 solversData.Add(acoSolver);
-                solversData.Add(saSolver);
-                solversData.Add(psoSolver);
-                solversData.Add(gaSolver);
-                //PrintDebugLinesInEditor(graph, acoSolver);
+                //solversData.Add(saSolver);
+                //solversData.Add(psoSolver);
+                //solversData.Add(gaSolver);
+                PrintDebugLinesInEditor(graph, acoSolver);
                 //PrintDebugLinesInEditor(graph, gaSolver);
                 SaveTSPData(mdfilename, solversData, 1, "TSP_DATA_" + matrix.GetLength(0) + "x" + matrix.GetLength(1)); //aco_TSP.executionTime, aco_TSP.iterations);
                 solversData.Clear();

@@ -220,8 +220,8 @@ namespace SpaceOptimization{
             matrix = bspMazeGeneration.GetMatrix();
 
             //patch to fix the bug of the BSP algorithm
-            mapCreator.openNodes.Clear();
-            mapCreator.closedNodes.Clear();
+            //mapCreator.openNodes.Clear();
+            //mapCreator.closedNodes.Clear();
 
             mapCreator.SetNeighbors(matrix);
             this.width = matrix.GetLength(0);
