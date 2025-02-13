@@ -1,74 +1,64 @@
-# Project Title
+# Exploring Procedural Content Generation of Environments for Virtual Museums: a Mixed-Initiative Approach
 
-__One Paragraph+__ describing the project goes here. For example: This is a README template you would use to describe a scientific or data analysis project. Provide an overview of the goals of the project, how data was obtained, and other important details others or you in 6 months should be aware of.
-
-## Data
-
-Describe the dataset in more detail here if necessary
-
-__Data Contact__
-
-List a data contact that can be contacted for inqueries regarding archiving and/or removal of data. Two methods of contact should be left, including one that is outside / external to the current institution.
-
-* **Daniel E. Cook <danielecook@gmail.com>** - Contact for inqueries regarding data located in `primary/data/folder`.
-* __Expiration Date__ -  YYYYMMDD - Data can be (deleted | archived) <-- choose one
-
-Most scripts / analysis can be left as they often do not take up substantial amounts of space, so it is important to describe in detail how data should be handled.
+This project introduces a two-phase integrative system designed to support the development of virtual museums by generating digital environments. The system comprises two main components: (1) a Room Generator that addresses the challenge of creating varied and dynamic spatial configurations to enhance user engagement, leveraging multi-strategy models such as Genetic Algorithms (GAs) and Binary Space Partitioning (BSP) for spatial efficiency and adaptability; and (2) an Artwork Arrangement stage that optimizes artwork placement using Genetic Algorithms to maximize space utilization and ensure aesthetic diversity. Together, these components form a framework for generating diverse and interactive virtual museum environments, catering to the needs of designers seeking to create engaging and dynamic digital spaces. Taking into consideration these advancements, this project presents an opportunity to enrich the design and development process of virtual museums through a mixed-initiative tool. By providing designers and developers with automated options for generating new digital environments, the system reduces development time while preserving creative control over the virtual experience. This approach not only enhances creativity and efficiency but also contributes positively to the creation process, enabling more dynamic and engaging virtual museum environments.
 
 ## Getting Started
 
-What are the primary analysis scripts/starting points? How would the analysis be rerun?
+This project includes a case study of the Virtual Museum of Maule in Chile, which features four distinct collections: Pre-Columbian Cultures, Colony, Crafts, and Rural Life, Chilean Independence, and Pedro Olmos. The collections include 3D pieces digitized through photogrammetry, 3D scanning, and high-definition photography. Users can explore these collections interactively, view 3D objects in 360 degrees, and access cultural information. This system addresses previous limitations in the Virtual Museum of Maule by streamlining the creation of 3D environments and optimizing artifact arrangement, enhancing user experience with dynamic layouts and improved spatial flow.
 
-```
-Give an example
-```
+![Picture1](https://github.com/user-attachments/assets/63b92e90-4370-4431-ba45-1141771e7073)
 
 ### Requirements
 
-A step by step series of examples that tell you how to get a development/analysis env running
+The system requires use Unity Version 2022.3.52f1 or above
 
-Say what the step will be
+##Stages
 
-```
-Give the example
-```
+### Room Generator
 
-And repeat
+The Room Generator, as the first stage in creating a virtual museum environment, allows users to define spatial layouts by specifying dimensions like width, height, and maximum room size. Using an adaptable Binary Space Partitioning (BSP) algorithm, the system generates various room configurations, offering users flexibility to choose their preferred design. Each layout is translated into a structured model, simplifying future adjustments and assigning basic structure types (e.g., walls, floors, doors). Visual representations assist users in assessing layouts and planning exhibit placements. This mixed-initiative approach empowers users to maintain control over the environment’s design while reducing time-consuming tasks, ensuring that the virtual museum’s layout aligns with the curated narrative and collection.
 
-```
-until finished
-```
+![step1_v5](https://github.com/user-attachments/assets/ac4e6a5c-e2c3-4397-b76d-78eaa1f1c159)
 
-End with an example of getting some data out of the system or using. It is also worth listing what the requirements are.
+### Artwork Arrangement
 
-## Publications
+The Artwork Arrangement stage optimizes the placement of artworks within the generated museum layout using a Genetic Algorithm, which evaluates multiple configurations to ensure accessibility and aesthetic balance. This process simplifies spatial organization into a one-dimensional floor mapping, retaining only feasible layouts that meet spatial and accessibility requirements. To further ensure the feasibility of the generated layouts, a path verification module was developed. It constructs a spatial representation capturing connections between rooms and key access points, using the Held-Karp heuristic to calculate optimal internal paths based on exhibit placement and entry points. The verification process includes four sub-stages: (A) identifying room structure and navigable areas, (B) configuring artwork placement, (C) assigning unique codes to rooms, and (D) combining these configurations to verify that the space is fully traversable.
 
-List references with links to publications this analysis was used for.
+![Frame 3](https://github.com/user-attachments/assets/9374d758-0e65-4100-80af-f45eac54fdaa)
 
- __The genetic basis of natural variation in Caenorhabditis elegans telomere length__<br />
-Cook DE, Zdraljevic S, Tanny RE, Seo B, Riccardi DD, Noble LM, Rockman MV, Alkema MJ, Braendle C, Kammenga JE, Wang J, Kruglyak L, Fe ́ lix MA, Lee J, Andersen EC. <br />
-2016. Genetics 204:371–383. DOI: https://doi.org/10.1534/genetics.116. 191148, PMID: 27449056
+## Example of a generated museum
 
-## Contributing
+The proposed system demonstrates potential in generating structured and diverse virtual museum environments through the combination of BSP and GA, enabling varied spatial configurations with logical exhibition organization. While the layouts support different exhibition styles, further evaluation with visitors is needed to assess navigability and user experience. Incorporating additional constraints, such as visitor flow analysis or thematic grouping, could enhance the system’s adaptability, making it a valuable tool for curators and designers.
 
-Details regarding how to contribute. Coding style conventions, use of tests, etc.
+![Final_Representation](https://github.com/user-attachments/assets/aa99f70c-d005-4257-9b89-9005e7d9bf22)
 
 ## Notes
 
-Additional notes / precatuions / etc. to make users aware of.
+This repository is part of a Research Article titled "Exploring Procedural Content Generation of Environments for Virtual Museums: a Mixed-Initiative Approach", for more details about each stage and the performance analyses performed, download the associated paper (ref to the paper's doi)
+
+## Publications
+
+Aquí debieran ir las publicaciones relacionadas
 
 ## Authors
 
-List all authors, their contributions, and how to contact; Preferably an internal and external form of contact.
+* **Claudio Rubio Naranjo** - [ClaudixoPG](https://github.com/ClaudixoPG); crubio17@alumnos.utalca.cl; claudiorubio23@gmail.com
+* **Felipe Besoain** - [Fbesoain](https://github.com/fbesoain); fbesoain@utalca.cl
+* **Nicolas A. Barriga** - [Nbarriga](https://github.com/nbarriga); nbarriga@utalca.cl
+* **Ben Ingram**
+* **Huizilopoztli Luna-García**
 
-* **Daniel E. Cook** - *Initial work* - [danielecook](https://github.com/danielecook); danielecook@gmail.com
+## Contributions (CRediT author statement)
+ 
+Conceptualization, C.R. and F.B.; Data curation, C.R.; Formal analysis, C.R.; Funding acquisition, N.A.B.; Investigation, C.R., F.B. and N.A.B.; Methodology, C.R. and F.B.; Project administration, C.R. and F.B; Resources, F.B. and N.A.B;
+Software, C.R.; Supervision, F.B. and N.A.B.; Validation, C.R., N.A.B., B.I., H.L. and F.B.; Visualization, C.R.; Writing — original draft, C.R.; Writing — review and editing, F.B., B.I., N.A.B. and H.L. All authors have read and agreed to the published version of the manuscript.
 
 ## License
+
+AQUI NO SE QUE PONER
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+* Research funded by Agencia Nacional de Investigación y Desarrollo, ANID-Subdirección del Capital Humano/Doctorado Nacional/2023-21232404 and FONDECYT Iniciación grant 11220438.
