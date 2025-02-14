@@ -36,28 +36,10 @@ The proposed system demonstrates potential in generating structured and diverse 
 
 This repository is part of a Research Article titled "Exploring Procedural Content Generation of Environments for Virtual Museums: a Mixed-Initiative Approach", for more details about each stage and the performance analyses performed, download the associated paper (ref to the paper's doi)
 
-## Publications
-
-Aquí debieran ir las publicaciones relacionadas
-
 ## Authors
 
 * **Claudio Rubio Naranjo** - [ClaudixoPG](https://github.com/ClaudixoPG); crubio17@alumnos.utalca.cl; claudiorubio23@gmail.com
 * **Felipe Besoain** - [Fbesoain](https://github.com/fbesoain); fbesoain@utalca.cl
-* **Nicolas A. Barriga** - [Nbarriga](https://github.com/nbarriga); nbarriga@utalca.cl
-* **Ben Ingram**
-* **Huizilopoztli Luna-García**
-
-## Contributions (CRediT author statement)
- 
-Conceptualization, C.R. and F.B.; Data curation, C.R.; Formal analysis, C.R.; Funding acquisition, N.A.B.; Investigation, C.R., F.B. and N.A.B.; Methodology, C.R. and F.B.; Project administration, C.R. and F.B; Resources, F.B. and N.A.B;
-Software, C.R.; Supervision, F.B. and N.A.B.; Validation, C.R., N.A.B., B.I., H.L. and F.B.; Visualization, C.R.; Writing — original draft, C.R.; Writing — review and editing, F.B., B.I., N.A.B. and H.L. All authors have read and agreed to the published version of the manuscript.
-
-## License
-
-AQUI NO SE QUE PONER
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
